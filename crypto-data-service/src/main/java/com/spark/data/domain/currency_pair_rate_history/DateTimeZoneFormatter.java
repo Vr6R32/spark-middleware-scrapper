@@ -1,4 +1,4 @@
-package com.spark.data.currency_pair_rate_history;
+package com.spark.data.domain.currency_pair_rate_history;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -9,7 +9,7 @@ class DateTimeZoneFormatter {
     private DateTimeZoneFormatter() {
     }
 
-    public static ZonedDateTime convertUtcToZonedDateTime(long utcTimestamp, String userZoneId) {
+    public static ZonedDateTime convertUtcToUserZonedDateTime(long utcTimestamp, String userZoneId) {
         Instant instant = Instant.ofEpochMilli(utcTimestamp);
         return ZonedDateTime.ofInstant(instant, ZoneId.of(userZoneId));
     }

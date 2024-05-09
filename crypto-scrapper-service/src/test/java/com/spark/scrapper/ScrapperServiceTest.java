@@ -6,11 +6,10 @@ import com.spark.feign_client.CryptoDataServiceClient;
 import com.spark.models.model.BinanceCurrencyResponse;
 import com.spark.models.model.CurrencyPairDTO;
 import com.spark.models.model.ScrappedCurrency;
+import com.spark.models.request.ScrappedCurrencyUpdateRequest;
 import com.spark.models.response.AvailableCurrencyPairsResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import org.apache.logging.log4j.Level;
 
 
 import org.mockito.ArgumentCaptor;
@@ -41,7 +40,7 @@ class ScrapperServiceTest {
     private CryptoDataServiceClient cryptoDataServiceClient;
 
     @Captor
-    private ArgumentCaptor<Set<ScrappedCurrency>> captor;
+    private ArgumentCaptor<ScrappedCurrencyUpdateRequest> captor;
 
     private ScrapperService scrapperService;
 
@@ -81,7 +80,7 @@ class ScrapperServiceTest {
 
         // When
 
-        scrapperService.fetchDataFromBinance();
+        scrapperService.scrapeBinanceApiMarketData();
 
         // Then
 
@@ -89,7 +88,8 @@ class ScrapperServiceTest {
         verify(cryptoDataServiceClient, times(1)).getAvailableCurrencies();
         verify(restTemplate, times(2)).getForObject(anyString(), eq(BinanceCurrencyResponse.class));
 
-        Set<ScrappedCurrency> capturedSet = captor.getValue();
+        ScrappedCurrencyUpdateRequest request = captor.getValue();
+        Set<ScrappedCurrency> capturedSet = request.scrappedCurrencySet();
         Set<ScrappedCurrency> expectedSet = new HashSet<>();
 
         expectedSet.add(new ScrappedCurrency(BTCUSDT, btcLastPrice, Instant.now().toEpochMilli()));
@@ -111,7 +111,7 @@ class ScrapperServiceTest {
                 .thenThrow(new RestClientException("Mocked exception"));
 
         // When
-        scrapperService.fetchDataFromBinance();
+        scrapperService.scrapeBinanceApiMarketData();
 
         // Then
         TestLogger testLogger = TestLoggerFactory.getTestLogger(ScrapperService.class);

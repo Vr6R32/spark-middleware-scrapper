@@ -1,4 +1,4 @@
-package com.spark.data.currency_pair;
+package com.spark.data.domain.currency_pair;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

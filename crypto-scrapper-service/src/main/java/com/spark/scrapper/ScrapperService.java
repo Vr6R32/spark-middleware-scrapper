@@ -4,6 +4,7 @@ import com.spark.feign_client.CryptoDataServiceClient;
 import com.spark.models.model.BinanceCurrencyResponse;
 import com.spark.models.model.CurrencyPairDTO;
 import com.spark.models.model.ScrappedCurrency;
+import com.spark.models.request.ScrappedCurrencyUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +29,7 @@ class ScrapperService {
     private final CryptoDataServiceClient cryptoDataServiceClient;
 
     @Scheduled(fixedRateString = "${scheduler.intervalMilliseconds}")
-    public void fetchDataFromBinance() {
+    public void scrapeBinanceApiMarketData() {
         Set<CurrencyPairDTO> currenciesToScrape = cryptoDataServiceClient.getAvailableCurrencies().currencies();
 
         Set<ScrappedCurrency> scrappedCurrencySet = new HashSet<>();
@@ -44,7 +45,8 @@ class ScrapperService {
                 log.warn("EXCEPTION OCCURRED WHILE SCRAPPING BINANCE SERVICE -> {} WITH PAYLOAD -> {} ", exception.getMessage() , currencyPairDTO.symbol());
             }
         }
-        cryptoDataServiceClient.pushScrappedCurrencySetForUpdate(scrappedCurrencySet);
+        cryptoDataServiceClient.pushScrappedCurrencySetForUpdate(new ScrappedCurrencyUpdateRequest(scrappedCurrencySet, currenciesToScrape.size()));
+        log.info("SUCCESSFULLY SCRAPPED [{}] OF [{}] AVAILABLE CURRENCY PAIRS", scrappedCurrencySet.size(), currenciesToScrape.size());
     }
 
 }

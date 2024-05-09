@@ -1,8 +1,8 @@
-package com.spark.data.currency_pair_rate_history;
+package com.spark.data.domain.currency_pair_rate_history;
 
 import com.spark.models.response.CurrencyPairRateHistoryResponse;
 
-import static com.spark.data.currency_pair_rate_history.DateTimeZoneFormatter.convertUtcToZonedDateTime;
+import static com.spark.data.domain.currency_pair_rate_history.DateTimeZoneFormatter.convertUtcToUserZonedDateTime;
 
 class CurrencyPairRateHistoryMapper {
 
@@ -13,6 +13,6 @@ class CurrencyPairRateHistoryMapper {
         return new CurrencyPairRateHistoryResponse(
                 currencyPairRateHistory.getSymbol(),
                 currencyPairRateHistory.getValue(),
-                convertUtcToZonedDateTime(currencyPairRateHistory.getTimestamp(), userZoneId));
+                convertUtcToUserZonedDateTime(currencyPairRateHistory.getTimestamp(), userZoneId));
     }
 }

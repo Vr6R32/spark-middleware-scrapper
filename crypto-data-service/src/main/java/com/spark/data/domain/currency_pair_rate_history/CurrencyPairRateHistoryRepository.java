@@ -1,4 +1,4 @@
-package com.spark.data.currency_pair_rate_history;
+package com.spark.data.domain.currency_pair_rate_history;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

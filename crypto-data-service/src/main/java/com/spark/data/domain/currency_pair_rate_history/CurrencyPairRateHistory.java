@@ -1,4 +1,4 @@
-package com.spark.data.currency_pair_rate_history;
+package com.spark.data.domain.currency_pair_rate_history;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
