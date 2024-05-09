@@ -17,16 +17,14 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.*;
-import java.util.logging.Logger;
 
-import static com.github.valfirst.slf4jtest.LoggingEvent.warn;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -94,8 +92,8 @@ class ScrapperServiceTest {
         Set<ScrappedCurrency> capturedSet = captor.getValue();
         Set<ScrappedCurrency> expectedSet = new HashSet<>();
 
-        expectedSet.add(new ScrappedCurrency(BTCUSDT, btcLastPrice, Instant.now()));
-        expectedSet.add(new ScrappedCurrency(LTCUSDT, ltcLastPrice, Instant.now()));
+        expectedSet.add(new ScrappedCurrency(BTCUSDT, btcLastPrice, Instant.now().toEpochMilli()));
+        expectedSet.add(new ScrappedCurrency(LTCUSDT, ltcLastPrice, Instant.now().toEpochMilli()));
 
         assertThat(capturedSet).usingElementComparatorIgnoringFields("timestamp").containsExactlyInAnyOrderElementsOf(expectedSet);
     }
