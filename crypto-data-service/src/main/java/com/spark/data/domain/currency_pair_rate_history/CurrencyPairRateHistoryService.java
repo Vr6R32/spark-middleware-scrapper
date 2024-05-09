@@ -2,9 +2,11 @@ package com.spark.data.domain.currency_pair_rate_history;
 
 import com.spark.data.domain.currency_pair.CurrencyPairException;
 import com.spark.data.domain.currency_pair.CurrencyPairFacade;
+import com.spark.models.model.ChartRateHistory;
 import com.spark.models.model.CurrencyPairDTO;
 import com.spark.models.request.ScrappedCurrencyUpdateRequest;
-import com.spark.models.response.CurrencyPairRateHistoryResponse;
+import com.spark.models.response.CurrencyPairChartRateHistoryResponse;
+import com.spark.models.response.CurrencyPairSingleRateHistoryResponse;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.spark.data.domain.currency_pair.CurrencyPairException.SYMBOL_IS_NOT_AVAILABLE;
+import static com.spark.data.domain.currency_pair_rate_history.CurrencyPairRateHistoryMapper.mapCurrencyPairRateHistoryToChartResponse;
 import static com.spark.data.domain.currency_pair_rate_history.CurrencyPairRateHistoryMapper.mapCurrencyPairRateHistoryToResponseDTO;
 
 @Slf4j
@@ -60,7 +63,7 @@ class CurrencyPairRateHistoryService {
      * @return The response containing the latest currency pair rate history.
      * @throws CurrencyPairException if the specified currency pair symbol is not available.
      */
-    public CurrencyPairRateHistoryResponse getLatestCurrencyPairRate(String symbol, String userZoneId) {
+    public CurrencyPairSingleRateHistoryResponse getLatestCurrencyPairRate(String symbol, String userZoneId) {
         CurrencyPairRateHistory latestRateHistory = currencyPairRateHistoryRepository.findLatestCurrencyPairRateBySymbol(symbol)
                 .orElseThrow(() -> new CurrencyPairException(SYMBOL_IS_NOT_AVAILABLE, symbol));
         return mapCurrencyPairRateHistoryToResponseDTO(latestRateHistory, userZoneId);
@@ -71,17 +74,17 @@ class CurrencyPairRateHistoryService {
      *
      * @param symbol    The symbol of the currency pair.
      * @param userZoneId The user's time zone identifier.
-     * @return The list of currency pair rate history within the last 24 hours.
+     * @return The specified response object containing list of currency pair rate history within the last 24 hours.
      * @throws CurrencyPairException if the specified currency pair symbol is not available.
      */
-    public List<CurrencyPairRateHistoryResponse> getCurrencyPairLast24hRateHistory(String symbol, String userZoneId) {
+    public CurrencyPairChartRateHistoryResponse getCurrencyPairLast24hRateHistory(String symbol, String userZoneId) {
 
         long twentyFourHoursWindowTimeMillis = Instant.now().minusSeconds(ONE_DAY_IN_MILLIS).toEpochMilli();
         List<CurrencyPairRateHistory> twentyFourHourHistoryList = currencyPairRateHistoryRepository.findBySymbolAndTimestampGreaterThanEqual(symbol, twentyFourHoursWindowTimeMillis);
+        List<ChartRateHistory> chartRateHistoryList = twentyFourHourHistoryList.stream().map(e -> mapCurrencyPairRateHistoryToChartResponse(e, userZoneId)).toList();
 
-        return twentyFourHourHistoryList.stream()
-                .map(e -> mapCurrencyPairRateHistoryToResponseDTO(e, userZoneId))
-                .toList();
+        return new CurrencyPairChartRateHistoryResponse(symbol, chartRateHistoryList);
+
     }
 
     /**
@@ -90,7 +93,7 @@ class CurrencyPairRateHistoryService {
      * @param userZoneId The user's time zone identifier.
      * @return The list of latest currency pair rate history for all available currency pairs.
      */
-    public List<CurrencyPairRateHistoryResponse> getAvailableCurrencyPairsLatestCurrencyRate(String userZoneId) {
+    public List<CurrencyPairSingleRateHistoryResponse> getAvailableCurrencyPairsLatestCurrencyRate(String userZoneId) {
 
         Set<CurrencyPairDTO> currencies = currencyPairFacade.getAvailableCurrencies().currencies();
         List<String> symbols = currencies.stream().map(CurrencyPairDTO::symbol).toList();

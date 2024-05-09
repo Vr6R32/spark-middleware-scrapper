@@ -8,8 +8,6 @@ spring:
     time-zone: Europe/Warsaw
   datasource:
     driver-class-name: org.sqlite.JDBC
-#    url: jdbc:sqlite:C:\crypto-coin-data-scrapper\crypto-data-service\src\main\resources\db\sqlite.db
-#    url: jdbc:sqlite:crypto-data-service/src/main/resources/db/sqlite.db
     url: jdbc:sqlite:db/sqlite.db
     username:
     password:

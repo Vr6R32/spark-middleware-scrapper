@@ -2,7 +2,8 @@ package com.spark.data.infrastructure.controller;
 
 import com.spark.data.domain.currency_pair.CurrencyPairException;
 import com.spark.models.response.AvailableCurrencyPairsResponse;
-import com.spark.models.response.CurrencyPairRateHistoryResponse;
+import com.spark.models.response.CurrencyPairChartRateHistoryResponse;
+import com.spark.models.response.CurrencyPairSingleRateHistoryResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -25,11 +26,11 @@ public interface UserApi {
     @Operation(summary = "Get Latest Currency Pair Rate",
             description = "Retrieves the latest rate history for a specific currency pair.")
     @ApiResponse(responseCode = "200", description = "Successful retrieval of latest rate history",
-            content = @Content(mediaType = "application/json", schema = @Schema(implementation = CurrencyPairRateHistoryResponse.class)))
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = CurrencyPairSingleRateHistoryResponse.class)))
     @ApiResponse(responseCode = "400", description = "Bad request - Invalid symbol",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = CurrencyPairException.class)))
     @GetMapping("/api/v1/currencies/last/{symbol}")
-    CurrencyPairRateHistoryResponse getLatestCurrencyPairRate(
+    CurrencyPairSingleRateHistoryResponse getLatestCurrencyPairRate(
             @Parameter(description = "Symbol of the currency pair", required = true, example = "BTCUSDT")
             @PathVariable("symbol") String symbol,
             @Parameter(description = "User's timezone identifier", required = false, example = "Europe/Warsaw")
@@ -40,9 +41,9 @@ public interface UserApi {
     @ApiResponse(
             responseCode = "200",
             description = "Successful retrieval of rate history",
-            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = CurrencyPairRateHistoryResponse.class))))
+            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = CurrencyPairSingleRateHistoryResponse.class))))
     @GetMapping("/api/v1/currencies/lastDay/{symbol}")
-    List<CurrencyPairRateHistoryResponse> getCurrencyPairLast24hRateHistory(
+    CurrencyPairChartRateHistoryResponse getCurrencyPairLast24hRateHistory(
             @Parameter(description = "Symbol of the currency pair", required = true, example = "BTCUSDT")
             @PathVariable("symbol") String symbol,
             @Parameter(description = "User's timezone identifier", required = false, example = "Europe/Warsaw")
@@ -53,9 +54,9 @@ public interface UserApi {
     @ApiResponse(
             responseCode = "200",
             description = "Successful retrieval of latest rate histories",
-            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = CurrencyPairRateHistoryResponse.class))))
+            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = CurrencyPairSingleRateHistoryResponse.class))))
     @GetMapping("/api/v1/currencies/lastAll")
-    List<CurrencyPairRateHistoryResponse> getAvailableCurrencyPairsLatestCurrencyRate(
+    List<CurrencyPairSingleRateHistoryResponse> getAvailableCurrencyPairsLatestCurrencyRate(
             @Parameter(description = "User's timezone identifier", required = false, example = "Europe/Warsaw")
             @RequestParam(defaultValue = "Europe/Warsaw", required = false, name = "userZoneId") String userZoneId);
 
