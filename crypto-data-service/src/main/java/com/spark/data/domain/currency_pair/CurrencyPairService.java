@@ -1,7 +1,9 @@
 package com.spark.data.domain.currency_pair;
 
 import com.spark.models.model.CurrencyPairDTO;
-import com.spark.models.request.CurrencyPairRequest;
+import com.spark.models.request.CurrencyPairCreateRequest;
+import com.spark.models.request.CurrencyPairDeleteRequest;
+import com.spark.models.request.CurrencyPairUpdateRequest;
 import com.spark.models.response.AvailableCurrencyPairsResponse;
 import com.spark.models.response.CurrencyPairResponse;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,18 @@ import static com.spark.models.response.CurrencyPairResponse.*;
 class CurrencyPairService {
 
     private final CurrencyPairRepository currencyPairRepository;
+
+
+    /**
+     * Retrieves currency pair DTO by given symbol
+     *
+     * @return Response containing currency pair data info.
+     */
+    public CurrencyPairDTO findCurrencyPairDTOBySymbol(String symbol) {
+        CurrencyPair currencyPair = currencyPairRepository.findBySymbol(symbol)
+                .orElseThrow(() -> new CurrencyPairException(SYMBOL_IS_NOT_AVAILABLE, symbol));
+        return mapCurrencyPairToDTO(currencyPair);
+    }
 
     /**
      * Retrieves all available currency pairs.
@@ -41,10 +55,10 @@ class CurrencyPairService {
      * @return Response indicating the success of the operation and the newly registered currency pair.
      * @throws CurrencyPairException if the specified currency pair already exists.
      */
-    public CurrencyPairResponse registerNewCurrencyPair(CurrencyPairRequest request) {
-        if (currencyPairRepository.findBySymbol(request.symbol()).isPresent()) {
-            throw new CurrencyPairException(SYMBOL_ALREADY_EXISTS);
-        }
+    public CurrencyPairResponse registerNewCurrencyPair(CurrencyPairCreateRequest request) {
+        currencyPairRepository.findBySymbol(request.symbol()).ifPresent(currencyPair -> {
+            throw new CurrencyPairException(SYMBOL_ALREADY_EXISTS, request.symbol());
+        });
         CurrencyPair newCurrencyPair = CurrencyPair.builder().symbol(request.symbol()).build();
         currencyPairRepository.save(newCurrencyPair);
         return new CurrencyPairResponse(CREATED_RESPONSE, mapCurrencyPairToDTO(newCurrencyPair));
@@ -57,11 +71,10 @@ class CurrencyPairService {
      * @return Response indicating the success of the operation and the deleted currency pair.
      * @throws CurrencyPairException if the specified currency pair is not available.
      */
-    public CurrencyPairResponse deleteCurrencyPair(CurrencyPairRequest request) {
-        CurrencyPair deletedCurrencyPair = currencyPairRepository.findBySymbol(request.symbol())
-                .orElseThrow(() -> new CurrencyPairException(SYMBOL_IS_NOT_AVAILABLE));
-        currencyPairRepository.deleteById(deletedCurrencyPair.getId());
-        return new CurrencyPairResponse(DELETED_RESPONSE, mapCurrencyPairToDTO(deletedCurrencyPair));
+    public CurrencyPairResponse deleteCurrencyPair(CurrencyPairDeleteRequest request) {
+        CurrencyPairDTO currencyPairToDelete = findCurrencyPairDTOBySymbol(request.symbol());
+        currencyPairRepository.deleteById(currencyPairToDelete.id());
+        return new CurrencyPairResponse(DELETED_RESPONSE, currencyPairToDelete);
     }
 
     /**
@@ -73,11 +86,12 @@ class CurrencyPairService {
      * @return A response indicating the success of the operation and the updated currency pair data.
      * @throws CurrencyPairException if the specified currency pair is not available.
      */
-    public CurrencyPairResponse changeCurrencyPairData(CurrencyPairRequest request) {
+    public CurrencyPairResponse changeCurrencyPairData(CurrencyPairUpdateRequest request) {
         CurrencyPair currencyPairToChange = currencyPairRepository.findBySymbol(request.symbol())
-                .orElseThrow(() -> new CurrencyPairException(SYMBOL_IS_NOT_AVAILABLE));
+                .orElseThrow(() -> new CurrencyPairException(SYMBOL_IS_NOT_AVAILABLE, request.symbol()));
         currencyPairToChange.setSymbol(request.symbol());
         CurrencyPair changedCurrencyPair = currencyPairRepository.save(currencyPairToChange);
         return new CurrencyPairResponse(EDITED_RESPONSE, mapCurrencyPairToDTO(changedCurrencyPair));
     }
+
 }

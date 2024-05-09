@@ -11,7 +11,9 @@ import java.util.Optional;
 @Repository
 interface CurrencyPairRateHistoryRepository extends JpaRepository<CurrencyPairRateHistory,Long> {
 
-    Optional<CurrencyPairRateHistory> findBySymbol(String symbol);
+
+    @Query("SELECT c FROM CurrencyPairRateHistory c WHERE c.symbol = :symbol AND c.timestamp = (SELECT MAX(cr.timestamp) FROM CurrencyPairRateHistory cr WHERE cr.symbol = :symbol)")
+    Optional<CurrencyPairRateHistory> findLatestCurrencyPairRateBySymbol(@Param("symbol") String symbol);
 
     List<CurrencyPairRateHistory> findBySymbolAndTimestampGreaterThanEqual(String symbol, long twentyFourHoursWindowTimeMillis);
 

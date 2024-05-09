@@ -10,7 +10,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/currencies")
-record CurrencyPairUserController(CurrencyPairFacade currencyPairFacade, CurrencyPairRateHistoryFacade currencyPairRateHistoryFacade) {
+record CurrencyPairUserController(CurrencyPairFacade currencyPairFacade, CurrencyPairRateHistoryFacade currencyPairRateHistoryFacade) implements UserApi {
+
 
     @GetMapping
     public AvailableCurrencyPairsResponse getAvailableCurrencies() {
@@ -19,14 +20,14 @@ record CurrencyPairUserController(CurrencyPairFacade currencyPairFacade, Currenc
 
     @GetMapping("/last/{symbol}")
     public CurrencyPairRateHistoryResponse getLatestCurrencyPairRate(@PathVariable("symbol") String symbol,
-                                                                     @RequestParam(defaultValue = "Europe/Warsaw", required = false, name = "userZoneId") String userZoneId){
+                                                                     @RequestParam(defaultValue = "Europe/Warsaw", required = false, name = "userZoneId") String userZoneId) {
         return currencyPairRateHistoryFacade.getLatestCurrencyPairRate(symbol, userZoneId);
     }
 
     @GetMapping("/lastDay/{symbol}")
     public List<CurrencyPairRateHistoryResponse> getCurrencyPairLast24hRateHistory(@PathVariable("symbol") String symbol,
                                                                                    @RequestParam(defaultValue = "Europe/Warsaw", required = false, name = "userZoneId") String userZoneId) {
-        return currencyPairRateHistoryFacade.getCurrencyPairLast24hRateHistory(symbol,userZoneId);
+        return currencyPairRateHistoryFacade.getCurrencyPairLast24hRateHistory(symbol, userZoneId);
     }
 
     @GetMapping("/lastAll")

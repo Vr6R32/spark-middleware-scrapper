@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.spark.data.domain.currency_pair.CurrencyPairException.SYMBOL_IS_NOT_AVAILABLE;
+import static com.spark.data.domain.currency_pair_rate_history.CurrencyPairRateHistoryMapper.mapCurrencyPairRateHistoryToResponseDTO;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -60,9 +61,9 @@ class CurrencyPairRateHistoryService {
      * @throws CurrencyPairException if the specified currency pair symbol is not available.
      */
     public CurrencyPairRateHistoryResponse getLatestCurrencyPairRate(String symbol, String userZoneId) {
-        CurrencyPairRateHistory latestRateHistory = currencyPairRateHistoryRepository.findBySymbol(symbol)
-                .orElseThrow(() -> new CurrencyPairException(SYMBOL_IS_NOT_AVAILABLE));
-        return CurrencyPairRateHistoryMapper.mapCurrencyPairRateHistoryToResponseDTO(latestRateHistory, userZoneId);
+        CurrencyPairRateHistory latestRateHistory = currencyPairRateHistoryRepository.findLatestCurrencyPairRateBySymbol(symbol)
+                .orElseThrow(() -> new CurrencyPairException(SYMBOL_IS_NOT_AVAILABLE, symbol));
+        return mapCurrencyPairRateHistoryToResponseDTO(latestRateHistory, userZoneId);
     }
 
     /**
@@ -74,10 +75,12 @@ class CurrencyPairRateHistoryService {
      * @throws CurrencyPairException if the specified currency pair symbol is not available.
      */
     public List<CurrencyPairRateHistoryResponse> getCurrencyPairLast24hRateHistory(String symbol, String userZoneId) {
+
         long twentyFourHoursWindowTimeMillis = Instant.now().minusSeconds(ONE_DAY_IN_MILLIS).toEpochMilli();
         List<CurrencyPairRateHistory> twentyFourHourHistoryList = currencyPairRateHistoryRepository.findBySymbolAndTimestampGreaterThanEqual(symbol, twentyFourHoursWindowTimeMillis);
+
         return twentyFourHourHistoryList.stream()
-                .map(e -> CurrencyPairRateHistoryMapper.mapCurrencyPairRateHistoryToResponseDTO(e, userZoneId))
+                .map(e -> mapCurrencyPairRateHistoryToResponseDTO(e, userZoneId))
                 .toList();
     }
 
@@ -88,11 +91,13 @@ class CurrencyPairRateHistoryService {
      * @return The list of latest currency pair rate history for all available currency pairs.
      */
     public List<CurrencyPairRateHistoryResponse> getAvailableCurrencyPairsLatestCurrencyRate(String userZoneId) {
+
         Set<CurrencyPairDTO> currencies = currencyPairFacade.getAvailableCurrencies().currencies();
         List<String> symbols = currencies.stream().map(CurrencyPairDTO::symbol).toList();
         List<CurrencyPairRateHistory> allCurrenciesLatestValue = currencyPairRateHistoryRepository.findAllCurrenciesLatestValue(symbols);
+
         return allCurrenciesLatestValue.stream()
-                .map(e -> CurrencyPairRateHistoryMapper.mapCurrencyPairRateHistoryToResponseDTO(e, userZoneId))
+                .map(e -> mapCurrencyPairRateHistoryToResponseDTO(e, userZoneId))
                 .toList();
     }
 }
