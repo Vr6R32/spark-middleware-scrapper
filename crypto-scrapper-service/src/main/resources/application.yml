@@ -1,0 +1,18 @@
+server:
+  port: 9000
+
+spring:
+  application:
+    name: scrapper-service
+  jackson:
+    time-zone: Europe/Warsaw
+
+binance:
+  apiUrl: https://api.binance.com/api/v3/ticker?symbol=
+
+scheduler:
+#  intervalMilliseconds: 6000 # 6 seconds
+  intervalMilliseconds: 10000 # 10 seconds
+#  intervalMilliseconds: 60000 # 1 minute
+#  intervalMilliseconds: 600000 # 10 minutes
+

@@ -1,0 +1,26 @@
+package com.spark.data.currency_pair_rate_history;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+interface CurrencyPairRateHistoryRepository extends JpaRepository<CurrencyPairRateHistory,Long> {
+
+    Optional<CurrencyPairRateHistory> findBySymbol(String symbol);
+
+    List<CurrencyPairRateHistory> findBySymbolAndTimestampGreaterThanEqual(String symbol, long twentyFourHoursWindowTimeMillis);
+
+    @Query("SELECT c FROM CurrencyPairRateHistory c " +
+            "WHERE c.symbol IN :symbols " +
+            "AND c.timestamp = (" +
+            "SELECT MAX(c2.timestamp) FROM CurrencyPairRateHistory c2 " +
+            "WHERE c2.symbol = c.symbol" +
+            ")")
+    List<CurrencyPairRateHistory> findAllCurrenciesLatestValue(@Param("symbols") List<String> symbols);
+
+}

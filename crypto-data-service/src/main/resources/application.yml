@@ -1,0 +1,29 @@
+server:
+  port: 9001
+
+spring:
+  application:
+    name: data-service
+  jackson:
+    time-zone: Europe/Warsaw
+  datasource:
+    driver-class-name: org.sqlite.JDBC
+#    url: jdbc:sqlite:C:\crypto-coin-data-scrapper\crypto-data-service\src\main\resources\db\sqlite.db
+#    url: jdbc:sqlite:crypto-data-service/src/main/resources/db/sqlite.db
+    url: jdbc:sqlite:db/sqlite.db
+    username:
+    password:
+    hikari:
+      max-lifetime: 600000
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.community.dialect.SQLiteDialect
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+  liquibase:
+    enabled: true
+    drop-first: false
+    change-log: classpath:db/changelog/db.changelog-master.xml

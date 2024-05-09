@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="1" author="michal-k">
+        <sql>
+            CREATE TABLE IF NOT EXISTS currency_pair_rate_history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                symbol VARCHAR(255) NOT NULL,
+                value DECIMAL(12, 8) NOT NULL,
+                timestamp INTEGER NOT NULL
+                );
+
+            CREATE INDEX idx_symbol ON currency_pair_rate_history (symbol);
+            CREATE INDEX idx_symbol_timestamp ON currency_pair_rate_history (symbol, timestamp DESC);
+        </sql>
+    </changeSet>
+
+    <changeSet id="2" author="michal-k">
+        <sql>
+            CREATE TABLE IF NOT EXISTS currency_pair (
+                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                 symbol VARCHAR(20) NOT NULL
+            );
+        </sql>
+    </changeSet>
+
+
+
+
+
+</databaseChangeLog>
