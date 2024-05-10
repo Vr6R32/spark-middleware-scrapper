@@ -10,7 +10,8 @@ function colorButtonListener() {
 function currencySelectorListener() {
     let currencySelector = document.getElementById('currency-selector');
     currencySelector.addEventListener('change', function () {
-        fetchCoinRateHistory(this.value);
+        selectedSymbol = this.value;
+        fetchCoinRateHistory(selectedSymbol);
     });
 }
 

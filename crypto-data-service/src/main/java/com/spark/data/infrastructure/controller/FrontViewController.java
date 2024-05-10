@@ -8,6 +8,11 @@ public class FrontViewController {
 
     @GetMapping("/chart")
     public String getChart(){
-        return "chart.html";
+        return "chart-rest.html";
+    }
+
+    @GetMapping("/chart-ws")
+    public String getWebSocketChart(){
+        return "chart-websocket.html";
     }
 }

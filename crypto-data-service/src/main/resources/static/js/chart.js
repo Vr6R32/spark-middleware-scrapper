@@ -1,5 +1,6 @@
 let coinChart;
 let currentData;
+let selectedSymbol;
 let useSingleColor = true;
 let dragZoomDisabled = true;
 let black_color = 'rgb(0, 0, 0, 0.4)';
@@ -24,7 +25,6 @@ function addData(label, newData) {
         dataset.data.push(newData);
     });
     coinChart.update();
-
 }
 
 function toggleDragZoom() {
@@ -74,7 +74,7 @@ function createOrUpdateChart(data, resetzoom) {
                     data: values,
                     borderColor: getBorderColor,
                     tension: 0.1,
-                    pointRadius: 2,
+                    pointRadius: 0,
                     pointBorderColor: ctx => {
                         if (useSingleColor) {
                             return teal_color;
@@ -102,9 +102,12 @@ function createOrUpdateChart(data, resetzoom) {
                             }
                         }
                     },
+                    tooltip: {
+                        enabled: true,
+                        intersect: false,
+                    },
                     title: {
                         display: true,
-                        // text: 'Price Chart'
                         text: data.timeWindow + ' Price Chart'
                     },
                     zoom: {
@@ -141,7 +144,9 @@ function createOrUpdateChart(data, resetzoom) {
                             color: 'white',
                             font: {
                                 size: 16
-                            }
+                            },
+                            minRotation: 0,
+                            maxRotation: 25
                         },
                         grid: {
                             color: gray_color
@@ -153,7 +158,7 @@ function createOrUpdateChart(data, resetzoom) {
                             color: 'white',
                             font: {
                                 size: 16
-                            }
+                            },
                         },
                         grid: {
                             color: gray_color

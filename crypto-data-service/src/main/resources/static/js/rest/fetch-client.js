@@ -31,7 +31,8 @@ function fetchAvailableCurrencies() {
                 option.text = currency.symbol;
                 currencySelector.appendChild(option);
             });
-            fetchCoinRateHistory(currencySelector.value);
+            selectedSymbol = currencySelector.value;
+            fetchCoinRateHistory(selectedSymbol);
         })
         .catch(error => {
             console.error('ERROR OCCURRED', error.message);

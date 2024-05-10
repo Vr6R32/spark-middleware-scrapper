@@ -10,9 +10,10 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>crypto-scrapper-service</module>
         <module>commons</module>
         <module>crypto-data-service</module>
+        <module>crypto-scrapper-service</module>
+        <module>crypto-websocket-service</module>
     </modules>
 
     <properties>
