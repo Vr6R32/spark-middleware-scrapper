@@ -83,7 +83,7 @@ class CurrencyPairRateHistoryService {
         List<CurrencyPairRateHistory> twentyFourHourHistoryList = currencyPairRateHistoryRepository.findBySymbolAndTimestampGreaterThanEqual(symbol, twentyFourHoursWindowTimeMillis);
         List<ChartRateHistory> chartRateHistoryList = twentyFourHourHistoryList.stream().map(e -> mapCurrencyPairRateHistoryToChartResponse(e, userZoneId)).toList();
 
-        return new CurrencyPairChartRateHistoryResponse(symbol, chartRateHistoryList);
+        return new CurrencyPairChartRateHistoryResponse(symbol,"24h", chartRateHistoryList);
 
     }
 

@@ -1,56 +1,22 @@
 let coinChart;
+let currentData;
+let useSingleColor = true;
+let dragZoomDisabled = true;
+let black_color = 'rgb(0, 0, 0, 0.4)';
+let teal_color = 'rgb(105, 232, 192)';
+let red_color = 'rgb(255, 99, 132)';
+let gray_color = 'rgba(90,90,90,0.5)';
+
+
 
 document.addEventListener('DOMContentLoaded', function() {
-    const currencySelector = document.getElementById('currency-selector');
     fetchAvailableCurrencies();
-    currencySelector.addEventListener('change', function() {
-        fetchCoinRateHistory(this.value);
-    });
+    currencySelectorListener();
+    colorButtonListener();
+    windowResizeListener();
+    dragZoomListener();
 });
 
-window.addEventListener('resize', function() {
-    coinChart.resize();
-});
-
-function fetchAvailableCurrencies() {
-    fetch('/api/v1/currencies')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('ERROR OCCURRED WHILE FETCHING AVAILABLE CURRENCY DATA');
-            }
-            return response.json();
-        })
-        .then(data => {
-            const currencySelector = document.getElementById('currency-selector');
-            data.currencies.forEach(currency => {
-                const option = document.createElement('option');
-                option.value = currency.symbol;
-                option.text = currency.symbol;
-                currencySelector.appendChild(option);
-            });
-            fetchCoinRateHistory(currencySelector.value);
-        })
-        .catch(error => {
-            console.error('ERROR OCCURRED', error.message);
-        });
-}
-
-
-function fetchCoinRateHistory(selectedSymbol) {
-    fetch('/api/v1/currencies/lastDay/' + selectedSymbol)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('ERROR OCCURRED WHILE FETCHING CURRENCY RATE HISTORY DATA');
-            }
-            return response.json();
-        })
-        .then(data => {
-            createOrUpdateChart(data);
-        })
-        .catch(error => {
-            console.error('ERROR OCCURRED', error);
-        });
-}
 
 function addData(label, newData) {
     coinChart.data.labels.push(label);
@@ -61,15 +27,39 @@ function addData(label, newData) {
 
 }
 
-function createOrUpdateChart(data) {
+function toggleDragZoom() {
+    if (coinChart) {
+        dragZoomDisabled = !dragZoomDisabled;
+        this.classList.toggle('active');
+        coinChart.options.plugins.zoom.pan.enabled = dragZoomDisabled;
+        coinChart.options.plugins.zoom.zoom.drag.enabled = !dragZoomDisabled;
+        coinChart.update();
+    }
+}
 
+
+function createOrUpdateChart(data, resetzoom) {
     const labels = data.rateHistory.map(entry => new Date(entry.timestamp));
     const values = data.rateHistory.map(entry => entry.value);
 
     const canvasObject = document.getElementById('chart').getContext('2d');
 
+    const getBorderColor = (ctx) => {
+        if (useSingleColor) {
+            return teal_color;
+        } else {
+            const p0 = ctx.p0DataIndex;
+            const p1 = ctx.p1DataIndex;
+            if (p1 === undefined || p0 === undefined) return teal_color;
+            return ctx.chart.data.datasets[0].data[p1] > ctx.chart.data.datasets[0].data[p0] ? red_color : teal_color;
+        }
+    };
+
+
     if (coinChart) {
-        coinChart.resetZoom();
+        if(resetzoom) {
+            coinChart.resetZoom();
+        }
         coinChart.data.labels = labels;
         coinChart.data.datasets[0].data = values;
         coinChart.data.datasets[0].label = '(' + data.symbol + ') Price';
@@ -82,47 +72,68 @@ function createOrUpdateChart(data) {
                 datasets: [{
                     label: '(' + data.symbol + ') Price',
                     data: values,
-                    borderColor: 'rgb(105, 232, 192)',
-                    // borderColor: 'rgb(148, 0, 211)',
-                    // borderColor: 'rgb(75, 192, 192)',
-                    tension: 0.2,
-                    fill: true
+                    borderColor: getBorderColor,
+                    tension: 0.1,
+                    pointRadius: 2,
+                    pointBorderColor: ctx => {
+                        if (useSingleColor) {
+                            return teal_color;
+                        }
+                        const index = ctx.dataIndex;
+                        const data = ctx.dataset.data;
+                        if (index === 0) return teal_color;
+                        return data[index] > data[index - 1] ? red_color : teal_color;
+                    },
+                    pointBackgroundColor: black_color,
+                    fill: false,
+                    segment: {
+                        borderColor: getBorderColor
+                    }
                 }]
             },
             options: {
-                animation: true,
                 responsive: true,
                 plugins: {
                     legend: {
                         labels: {
-                            ticks: {
-                                color: 'white',
-                                font: {
-                                    size: 16
-                                }
+                            color: 'white',
+                            font: {
+                                size: 16
                             }
                         }
                     },
                     title: {
                         display: true,
-                        text: 'Price Chart'
+                        // text: 'Price Chart'
+                        text: data.timeWindow + ' Price Chart'
                     },
                     zoom: {
+                        pan: {
+                            enabled: true,
+                            mode: 'xy'
+                        },
                         zoom: {
                             wheel: {
-                                enabled: true,
-                            },
-                            drag: {
                                 enabled: true
+                            },
+                            pinch: {
+                                enabled: true
+                            },
+                            mode: 'xy',
+                            drag: {
+                                enabled: false,
+                                mode: 'xy',
+                                threshold: 5,
+                                onDragComplete: function ({chart}) {
+                                    chart.update();
+                                }
                             }
-                        },
-
+                        }
                     }
                 },
                 scales: {
                     x: {
                         type: 'time',
-
                         time: {
                             unit: 'minute'
                         },
@@ -130,13 +141,10 @@ function createOrUpdateChart(data) {
                             color: 'white',
                             font: {
                                 size: 16
-                            },
-                            // autoSkip: true,
-                            // maxRotation: 0,
-                            // minRotation: 0
+                            }
                         },
                         grid: {
-                            color: 'rgba(90,90,90,0.5)'
+                            color: gray_color
                         }
                     },
                     y: {
@@ -148,7 +156,7 @@ function createOrUpdateChart(data) {
                             }
                         },
                         grid: {
-                            color: 'rgba(90,90,90,0.5)'
+                            color: gray_color
                         }
                     }
                 },
@@ -160,4 +168,3 @@ function createOrUpdateChart(data) {
         });
     }
 }
-
