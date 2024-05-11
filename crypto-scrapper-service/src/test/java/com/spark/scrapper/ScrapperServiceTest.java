@@ -3,6 +3,7 @@ package com.spark.scrapper;
 import com.github.valfirst.slf4jtest.TestLogger;
 import com.github.valfirst.slf4jtest.TestLoggerFactory;
 import com.spark.feign_client.CryptoDataServiceClient;
+import com.spark.feign_client.WebSocketServiceClient;
 import com.spark.models.model.BinanceCurrencyResponse;
 import com.spark.models.model.CurrencyPairDTO;
 import com.spark.models.model.ScrappedCurrency;
@@ -39,6 +40,9 @@ class ScrapperServiceTest {
     @Mock
     private CryptoDataServiceClient cryptoDataServiceClient;
 
+    @Mock
+    private WebSocketServiceClient webSocketServiceClient;
+
     @Captor
     private ArgumentCaptor<ScrappedCurrencyUpdateRequest> captor;
 
@@ -47,7 +51,7 @@ class ScrapperServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        scrapperService = new ScrapperService(restTemplate, cryptoDataServiceClient);
+        scrapperService = new ScrapperService(restTemplate, webSocketServiceClient, cryptoDataServiceClient);
     }
 
     @Test
@@ -84,9 +88,10 @@ class ScrapperServiceTest {
 
         // Then
 
+        verify(webSocketServiceClient, times(1)).pushScrappedDataForUpdateToWebSocketSessions(captor.capture());
         verify(cryptoDataServiceClient, times(1)).pushScrappedCurrencySetForUpdate(captor.capture());
         verify(cryptoDataServiceClient, times(1)).getAvailableCurrencies();
-        verify(restTemplate, times(2)).getForObject(anyString(), eq(BinanceCurrencyResponse.class));
+        verify(restTemplate, times(currenciesToScrape.size())).getForObject(anyString(), eq(BinanceCurrencyResponse.class));
 
         ScrappedCurrencyUpdateRequest request = captor.getValue();
         Set<ScrappedCurrency> capturedSet = request.scrappedCurrencySet();

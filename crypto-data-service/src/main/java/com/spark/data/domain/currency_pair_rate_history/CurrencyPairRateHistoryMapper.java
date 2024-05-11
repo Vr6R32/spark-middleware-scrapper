@@ -3,7 +3,7 @@ package com.spark.data.domain.currency_pair_rate_history;
 import com.spark.models.model.ChartRateHistory;
 import com.spark.models.response.CurrencyPairSingleRateHistoryResponse;
 
-import static com.spark.data.domain.currency_pair_rate_history.DateTimeZoneFormatter.convertUtcToUserZonedDateTime;
+import static com.spark.utils.DateTimeZoneFormatter.convertUtcToUserZonedDateTime;
 
 class CurrencyPairRateHistoryMapper {
 

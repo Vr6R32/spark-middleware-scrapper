@@ -6,6 +6,8 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
 
+import java.util.Objects;
+
 
 @Controller
 public record WsCurrencyPairController(WsCurrencyPairFacade wsCurrencyPairFacade) {
@@ -20,7 +22,8 @@ public record WsCurrencyPairController(WsCurrencyPairFacade wsCurrencyPairFacade
     @MessageMapping("api/v1/lastDay/{symbol}")
     public void getCurrencyPairLast24hRateHistory(@DestinationVariable("symbol") String symbol, StompHeaderAccessor accessor) {
         String sessionId = accessor.getSessionId();
-        wsCurrencyPairFacade.fetchAndSendCurrencyPairLast24hRateHistoryToSession(symbol,sessionId);
+        String userTimeZone = (String) Objects.requireNonNull(accessor.getSessionAttributes()).get("timeZone");
+        wsCurrencyPairFacade.fetchAndSendCurrencyPairLast24hRateHistoryToSession(symbol,sessionId,userTimeZone);
     }
 
 

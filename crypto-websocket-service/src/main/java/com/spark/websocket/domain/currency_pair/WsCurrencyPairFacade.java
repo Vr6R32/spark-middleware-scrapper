@@ -11,7 +11,7 @@ public class WsCurrencyPairFacade {
         wsCurrencyPairService.fetchAndSendAvailableCurrenciesToSession(sessionId);
     }
 
-    public void fetchAndSendCurrencyPairLast24hRateHistoryToSession(String symbol, String sessionId) {
-        wsCurrencyPairService.fetchAndSendCurrencyPairLast24hRateHistoryToSession(symbol, sessionId);
+    public void fetchAndSendCurrencyPairLast24hRateHistoryToSession(String symbol, String sessionId, String userTimeZone) {
+        wsCurrencyPairService.fetchAndSendCurrencyPairLast24hRateHistoryToSession(symbol, sessionId, userTimeZone);
     }
 }

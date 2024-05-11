@@ -1,6 +1,7 @@
 package com.spark.scrapper;
 
 import com.spark.feign_client.CryptoDataServiceClient;
+import com.spark.feign_client.WebSocketServiceClient;
 import com.spark.models.model.BinanceCurrencyResponse;
 import com.spark.models.model.CurrencyPairDTO;
 import com.spark.models.model.ScrappedCurrency;
@@ -26,6 +27,7 @@ class ScrapperService {
     private String binanceApiUrl;
 
     private final RestTemplate restTemplate;
+    private final WebSocketServiceClient webSocketServiceClient;
     private final CryptoDataServiceClient cryptoDataServiceClient;
 
     @Scheduled(fixedRateString = "${scheduler.intervalMilliseconds}")
@@ -45,7 +47,9 @@ class ScrapperService {
                 log.warn("EXCEPTION OCCURRED WHILE SCRAPPING BINANCE SERVICE -> {} WITH PAYLOAD -> {} ", exception.getMessage() , currencyPairDTO.symbol());
             }
         }
-        cryptoDataServiceClient.pushScrappedCurrencySetForUpdate(new ScrappedCurrencyUpdateRequest(scrappedCurrencySet, currenciesToScrape.size()));
+        ScrappedCurrencyUpdateRequest request = new ScrappedCurrencyUpdateRequest(scrappedCurrencySet, currenciesToScrape.size());
+        webSocketServiceClient.pushScrappedDataForUpdateToWebSocketSessions(request);
+        cryptoDataServiceClient.pushScrappedCurrencySetForUpdate(request);
         log.info("SUCCESSFULLY SCRAPPED [{}] OF [{}] AVAILABLE CURRENCY PAIRS", scrappedCurrencySet.size(), currenciesToScrape.size());
     }
 

@@ -5,11 +5,6 @@ document.addEventListener('DOMContentLoaded', function() {
     connectSocket();
 });
 
-function extractSessionId(socketUrl) {
-    const parts = socketUrl.split('/');
-    return parts[5];
-}
-
 function connectSocket(){
     if (stompClient && stompClient.connected) {
         stompClient.disconnect(function() {
@@ -19,11 +14,15 @@ function connectSocket(){
 
     // TODO SET INJECT URL BY VALUE FROM APP.YML
     // let socketUrl = document.getElementById('websocketUrl').value;
-    let socketUrl = 'http://localhost:9002/websocket'
+    let socketUrl = `http://localhost:9002/websocket?timezone=${getUserTimeZone()}`;
 
     const socket = new SockJS(socketUrl);
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
+
+        stompClient.debug = function (msg) {
+            // OVERRIDING THIS METHOD TURNS OFF CONSOLE PRINTING
+        };
 
         sessionId = extractSessionId(socket._transport.url);
 

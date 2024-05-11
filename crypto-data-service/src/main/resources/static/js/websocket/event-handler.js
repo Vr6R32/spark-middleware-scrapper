@@ -1,17 +1,17 @@
 
 
-function handleIncomingEvent(notificationMessage) {
-    if (notificationMessage.type === 'AVAILABLE_CURRENCIES') {
-        handleAvailableCurrenciesData(notificationMessage.payload);
+function handleIncomingEvent(event) {
+    if (event.type === 'AVAILABLE_CURRENCIES') {
+        handleAvailableCurrenciesData(event.payload);
     }
-    if (notificationMessage.type === 'LATEST_CURRENCY_PAIR_RATE') {
+    if (event.type === 'LATEST_CURRENCY_PAIR_RATE') {
         // TODO
     }
-    if (notificationMessage.type === 'LAST_24H_CURRENCY_PAIR_RATE_HISTORY') {
-        handleLast24hCurrencyPairRateHistory(notificationMessage);
+    if (event.type === 'LAST_24H_CURRENCY_PAIR_RATE_HISTORY') {
+        handleLast24hCurrencyPairRateHistory(event.payload);
     }
-    if (notificationMessage.type === 'CURRENCY_PAIR_RATE_HISTORY_UPDATE') {
-        // TODO
+    if (event.type === 'CURRENCY_PAIR_RATE_HISTORY_UPDATE') {
+        updateChartData(event.payload);
     }
 }
 
@@ -27,7 +27,6 @@ function handleAvailableCurrenciesData(payload) {
     fetchCoinRateHistory(selectedSymbol);
 }
 
-function handleLast24hCurrencyPairRateHistory(notificationMessage) {
-    currentData = notificationMessage.payload;
-    createOrUpdateChart(notificationMessage.payload, true);
+function handleLast24hCurrencyPairRateHistory(payload) {
+    initializeUpdateChart(payload, true);
 }

@@ -3,7 +3,7 @@ function colorButtonListener() {
     colorModeButton.addEventListener('click', function () {
         useSingleColor = !useSingleColor;
         this.classList.toggle('active');
-        createOrUpdateChart(currentData,false);
+        initializeUpdateChart(currentData,false);
     });
 }
 

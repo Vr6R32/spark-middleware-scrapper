@@ -1,10 +1,10 @@
-package com.spark.data.domain.currency_pair_rate_history;
+package com.spark.utils;
 
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-class DateTimeZoneFormatter {
+public class DateTimeZoneFormatter {
 
     private DateTimeZoneFormatter() {
     }

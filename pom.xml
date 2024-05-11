@@ -14,6 +14,7 @@
         <module>crypto-data-service</module>
         <module>crypto-scrapper-service</module>
         <module>crypto-websocket-service</module>
+        <module>commons/utils</module>
     </modules>
 
     <properties>

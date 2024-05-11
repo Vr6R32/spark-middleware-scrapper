@@ -1,6 +1,9 @@
 package com.spark.websocket.infrastructure.configuration;
 
+import com.spark.websocket.infrastructure.session.WebSocketSessionInterceptor;
+import com.spark.websocket.infrastructure.session.InMemoryWebSocketSessionManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -14,6 +17,16 @@ import org.springframework.web.socket.config.annotation.WebSocketTransportRegist
 @EnableWebSocketMessageBroker
 public class WsConfiguration implements WebSocketMessageBrokerConfigurer {
 
+
+    @Bean
+    public InMemoryWebSocketSessionManager sessionManager() {
+        return new InMemoryWebSocketSessionManager();
+    }
+
+    @Bean
+    public WebSocketSessionInterceptor webSocketInterceptor(){
+        return new WebSocketSessionInterceptor(sessionManager());
+    }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
@@ -32,6 +45,7 @@ public class WsConfiguration implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
         registry.setMessageSizeLimit(1000);
+        registry.addDecoratorFactory(webSocketInterceptor());
     }
 
     @Override
