@@ -16,6 +16,8 @@ let white_color = 'rgb(255, 255, 255)';
 document.addEventListener('DOMContentLoaded', function() {
     fetchAvailableCurrencies();
     currencySelectorListener();
+    tickRateSelectorListener();
+    resetZoomListener();
     windowResizeListener();
     colorButtonListener();
     dragZoomListener();
@@ -29,7 +31,7 @@ function updateChartData(newData) {
         timestamp: normalizeDate(newData.timestamp)
     };
 
-    //TODO THINK ABOUT THIS TIME COMPLEXITY , IS IT OKAY ?
+    // TODO THINK ABOUT THIS TIME COMPLEXITY , IS IT OKAY ?
     // INDEX [0] IS LATEST CURRENCY PAIR TIMESTAMP & VALUE
     // IS IT BETTER TO SORT DATA IN ASC ON BACKEND OR LET SORTING IT FOR CLIENT SIDE?
     // OR MAYBE LEAVE IT LIKE THIS THAT WE CAN HAVE LATEST VALUE AT FIRST INDEX
@@ -40,6 +42,25 @@ function updateChartData(newData) {
     initializeUpdateChart(currentData, false,true);
 }
 
+function resetChartZoom() {
+    if(coinChart.isZoomedOrPanned()){
+        coinChart.resetZoom();
+        coinChart.update();
+    }
+}
+
+function updateChartTimeUnit(unit) {
+    if (coinChart) {
+        if (unit==='auto') {
+            coinChart.options.scales.x.time.unit = '';
+            coinChart.update();
+        } else {
+            coinChart.options.scales.x.time.unit = unit;
+            coinChart.update();
+        }
+    }
+}
+
 function toggleDragZoom() {
     if (coinChart) {
         dragZoomDisabled = !dragZoomDisabled;
@@ -48,7 +69,6 @@ function toggleDragZoom() {
         coinChart.options.plugins.zoom.zoom.drag.enabled = !dragZoomDisabled;
         coinChart.update();
         // console.log(coinChart.getZoomLevel());
-        // console.log(coinChart.isZoomedOrPanned());
     }
 }
 
@@ -86,16 +106,14 @@ function initializeUpdateChart(data, resetzoom, isUpdate = false) {
         return data[index] > data[index - 1] ? red_color : teal_color;
     };
 
+
     if (coinChart) {
-        if(resetzoom) {
-            coinChart.resetZoom();
-            coinChart.update();
-        }
+        if(resetzoom) resetChartZoom();
         coinChart.data.labels = labels;
         coinChart.data.datasets[0].data = values;
         coinChart.data.datasets[0].label = '(' + data.symbol + ') Price';
-        if(isUpdate) coinChart.update('none');
 
+        if(isUpdate) coinChart.update('none');
         coinChart.update();
 
     } else {
@@ -172,7 +190,7 @@ function initializeUpdateChart(data, resetzoom, isUpdate = false) {
                                 //
                             },
                             wheel: {
-                                mode: 'xy',
+                                mode: 'x',
                                 enabled: true,
                             },
                             pinch: {
@@ -197,8 +215,7 @@ function initializeUpdateChart(data, resetzoom, isUpdate = false) {
                             //     minute: "HH:mm",
                             //     hour: "d-MMM HH:mm",
                             // },
-                            // TODO IN FUTURE MAKE THIS TIME UNIT GENERIC BASED ON RECEIVED DATA TIME WINDOW AND TICK RATE INTERVAL
-                            unit: 'hour'
+                            unit: '',
                         },
                         ticks: {
                             color: 'white',

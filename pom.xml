@@ -5,16 +5,17 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.spark</groupId>
-    <artifactId>crypto-coin-data-scrapper</artifactId>
+    <artifactId>spark-middleware-scrapper</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
         <module>commons</module>
+        <module>commons/utils</module>
         <module>crypto-data-service</module>
         <module>crypto-scrapper-service</module>
+        <module>crypto-frontend-service</module>
         <module>crypto-websocket-service</module>
-        <module>commons/utils</module>
     </modules>
 
     <properties>

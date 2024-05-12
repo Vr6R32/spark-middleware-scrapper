@@ -11,8 +11,11 @@ binance:
   apiUrl: https://api.binance.com/api/v3/ticker?symbol=
 
 scheduler:
-#  intervalMilliseconds: 6000 # 6 seconds
-  intervalMilliseconds: 10000 # 10 seconds
-#  intervalMilliseconds: 60000 # 1 minute
-#  intervalMilliseconds: 600000 # 10 minutes
+  intervalMilliseconds: 5000 # 5 seconds
+  #  intervalMilliseconds: 6000 # 6 seconds
+  #  intervalMilliseconds: 60000 # 1 minute
+  #  intervalMilliseconds: 600000 # 10 minutes
+
+  retryFetchIntervalMilliseconds: 1000
+  retryFetchAttempts: 3
 

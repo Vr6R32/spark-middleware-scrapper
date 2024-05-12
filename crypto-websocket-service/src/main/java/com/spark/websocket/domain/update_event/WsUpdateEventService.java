@@ -18,6 +18,7 @@ class WsUpdateEventService {
 
     private final WebSocketSessionManager webSocketSessionManager;
     private final SimpMessagingTemplate messagingTemplate;
+
     public void sendDataUpdateEventToUserSessions(ScrappedCurrencyUpdateRequest scrappedCurrencyUpdateRequest) {
         List<WebSocketSession> sessions = webSocketSessionManager.getAllActiveSessions();
 
@@ -29,9 +30,7 @@ class WsUpdateEventService {
                     .filter(c -> c.symbol().equals(symbol))
                     .findFirst()
                     .ifPresent(scrappedCurrency -> {
-                        CurrencyPairSingleRateHistoryResponse response = mapScrappedCurrencyToCurrencyPairSingleRateHistoryResponse(
-                                scrappedCurrency, timeZone
-                        );
+                        CurrencyPairSingleRateHistoryResponse response = mapScrappedCurrencyToCurrencyPairSingleRateHistoryResponse(scrappedCurrency, timeZone);
                         sendMessageToSession(session.getId(), response);
                     });
         });

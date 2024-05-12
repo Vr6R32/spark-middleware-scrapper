@@ -1,5 +1,4 @@
-package com.spark.feign_client;
-
+package com.spark.feign.client;
 
 import com.spark.models.request.ScrappedCurrencyUpdateRequest;
 import org.springframework.cloud.openfeign.FeignClient;

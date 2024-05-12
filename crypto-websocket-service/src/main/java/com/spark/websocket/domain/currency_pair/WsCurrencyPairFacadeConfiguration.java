@@ -1,6 +1,6 @@
 package com.spark.websocket.domain.currency_pair;
 
-import com.spark.feign_client.CryptoDataServiceClient;
+import com.spark.feign.client.CryptoDataServiceClient;
 import com.spark.websocket.infrastructure.session.WebSocketSessionManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

@@ -1,5 +1,5 @@
 function fetchCoinRateHistory(selectedSymbol) {
-    let url = `/api/v1/currencies/lastDay/${selectedSymbol}?timezone=${getUserTimeZone()}`;
+    let url = `http://localhost:9001/api/v1/currencies/lastDay/${selectedSymbol}?timezone=${getUserTimeZone()}`;
 
     fetch(url)
         .then(response => {
@@ -17,7 +17,7 @@ function fetchCoinRateHistory(selectedSymbol) {
 }
 
 function fetchAvailableCurrencies() {
-    fetch('/api/v1/currencies')
+    fetch('http://localhost:9001/api/v1/currencies')
         .then(response => {
             if (!response.ok) {
                 throw new Error('ERROR OCCURRED WHILE FETCHING AVAILABLE CURRENCY DATA');

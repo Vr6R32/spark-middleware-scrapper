@@ -15,7 +15,7 @@ interface CurrencyPairRateHistoryRepository extends JpaRepository<CurrencyPairRa
     @Query("SELECT c FROM CurrencyPairRateHistory c WHERE c.symbol = :symbol AND c.timestamp = (SELECT MAX(cr.timestamp) FROM CurrencyPairRateHistory cr WHERE cr.symbol = :symbol)")
     Optional<CurrencyPairRateHistory> findLatestCurrencyPairRateBySymbol(@Param("symbol") String symbol);
 
-    List<CurrencyPairRateHistory> findBySymbolAndTimestampGreaterThanEqual(String symbol, long twentyFourHoursWindowTimeMillis);
+    List<CurrencyPairRateHistory> findBySymbolAndTimestampGreaterThanEqual(String symbol, long windowTimeInMillis);
 
     @Query("SELECT c FROM CurrencyPairRateHistory c " +
             "WHERE c.symbol IN :symbols " +

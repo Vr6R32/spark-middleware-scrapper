@@ -1,23 +1,21 @@
 package com.spark.scrapper;
 
-import com.github.valfirst.slf4jtest.TestLogger;
-import com.github.valfirst.slf4jtest.TestLoggerFactory;
-import com.spark.feign_client.CryptoDataServiceClient;
-import com.spark.feign_client.WebSocketServiceClient;
+import com.spark.feign.client.CryptoDataServiceClient;
+import com.spark.feign.client.WebSocketServiceClient;
 import com.spark.models.model.BinanceCurrencyResponse;
 import com.spark.models.model.CurrencyPairDTO;
 import com.spark.models.model.ScrappedCurrency;
 import com.spark.models.request.ScrappedCurrencyUpdateRequest;
 import com.spark.models.response.AvailableCurrencyPairsResponse;
+import feign.Request;
+import feign.RetryableException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -26,7 +24,8 @@ import java.time.Instant;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+
+
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -34,6 +33,7 @@ class ScrapperServiceTest {
 
     public static final String BTCUSDT = "BTCUSDT";
     public static final String LTCUSDT = "LTCUSDT";
+
     @Mock
     private RestTemplate restTemplate;
 
@@ -46,19 +46,21 @@ class ScrapperServiceTest {
     @Captor
     private ArgumentCaptor<ScrappedCurrencyUpdateRequest> captor;
 
+    @InjectMocks
     private ScrapperService scrapperService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         scrapperService = new ScrapperService(restTemplate, webSocketServiceClient, cryptoDataServiceClient);
+        ReflectionTestUtils.setField(scrapperService, "retryInterval", 300);
+        ReflectionTestUtils.setField(scrapperService, "retryAttempts", 3);
     }
 
     @Test
     void shouldFetchDataFromBinanceAndPushToUpdateHappyPath() {
 
         // Given
-
         CurrencyPairDTO currencyPairBTC = new CurrencyPairDTO(1L, BTCUSDT);
         CurrencyPairDTO currencyPairLTC = new CurrencyPairDTO(2L, LTCUSDT);
         Set<CurrencyPairDTO> currenciesToScrape = Set.of(currencyPairLTC, currencyPairBTC);
@@ -89,12 +91,12 @@ class ScrapperServiceTest {
         // Then
 
         verify(webSocketServiceClient, times(1)).pushScrappedDataForUpdateToWebSocketSessions(captor.capture());
-        verify(cryptoDataServiceClient, times(1)).pushScrappedCurrencySetForUpdate(captor.capture());
+        verify(cryptoDataServiceClient, times(1)).pushScrappedCurrencySetForDataServiceUpdate(captor.capture());
         verify(cryptoDataServiceClient, times(1)).getAvailableCurrencies();
         verify(restTemplate, times(currenciesToScrape.size())).getForObject(anyString(), eq(BinanceCurrencyResponse.class));
 
-        ScrappedCurrencyUpdateRequest request = captor.getValue();
-        Set<ScrappedCurrency> capturedSet = request.scrappedCurrencySet();
+        ScrappedCurrencyUpdateRequest capturedRequest = captor.getValue();
+        Set<ScrappedCurrency> capturedSet = capturedRequest.scrappedCurrencySet();
         Set<ScrappedCurrency> expectedSet = new HashSet<>();
 
         expectedSet.add(new ScrappedCurrency(BTCUSDT, btcLastPrice, Instant.now().toEpochMilli()));
@@ -104,25 +106,87 @@ class ScrapperServiceTest {
     }
 
     @Test
-    void shouldLogWarnWhileUpdatingDataFromBinanceWhenThrowRestClientException() {
+    void shouldRetryOnFailureAndEventuallySucceedWhenPushUpdateToWebSocket() {
         // Given
         CurrencyPairDTO currencyPair = new CurrencyPairDTO(1L, BTCUSDT);
-        Set<CurrencyPairDTO> currenciesToScrape = Collections.singleton(currencyPair);
-
+        Set<CurrencyPairDTO> currenciesToScrape = Set.of(currencyPair);
         AvailableCurrencyPairsResponse availableCurrencyPairsResponse = new AvailableCurrencyPairsResponse(currenciesToScrape);
+
+        BigDecimal btcLastPrice = BigDecimal.valueOf(62300, 421);
+        BinanceCurrencyResponse binanceResponseBTC = BinanceCurrencyResponse.builder()
+                .symbol(BTCUSDT)
+                .lastPrice(btcLastPrice)
+                .build();
 
         when(cryptoDataServiceClient.getAvailableCurrencies()).thenReturn(availableCurrencyPairsResponse);
         when(restTemplate.getForObject(anyString(), eq(BinanceCurrencyResponse.class)))
-                .thenThrow(new RestClientException("Mocked exception"));
+                .thenThrow(new RestClientException("Binance Api Exception"))
+                .thenReturn(binanceResponseBTC);
 
         // When
         scrapperService.scrapeBinanceApiMarketData();
 
         // Then
-        TestLogger testLogger = TestLoggerFactory.getTestLogger(ScrapperService.class);
+        verify(restTemplate, times(2)).getForObject(anyString(), eq(BinanceCurrencyResponse.class));
 
-        assertEquals(1, testLogger.getLoggingEvents().size());
-        assertEquals("EXCEPTION OCCURRED WHILE SCRAPPING BINANCE SERVICE -> Mocked exception WITH PAYLOAD -> BTCUSDT ", testLogger.getLoggingEvents().get(0).getFormattedMessage());
+        ScrappedCurrencyUpdateRequest expectedScrappedCurrencyRequest = new ScrappedCurrencyUpdateRequest(Set.of(new ScrappedCurrency(BTCUSDT, btcLastPrice, 1231231231231L)), availableCurrencyPairsResponse.currencies().size());
+
+        verify(webSocketServiceClient, times(1)).pushScrappedDataForUpdateToWebSocketSessions(
+                argThat(request ->
+                        request.availableCurrencyPairs() == expectedScrappedCurrencyRequest.availableCurrencyPairs() &&
+                                request.scrappedCurrencySet().size() == expectedScrappedCurrencyRequest.scrappedCurrencySet().size() &&
+                                request.scrappedCurrencySet().stream().allMatch(sc ->
+                                        sc.symbol().equals(BTCUSDT) && sc.lastPrice().compareTo(btcLastPrice) == 0)
+                )
+        );
+    }
+
+
+    @Test
+    void shouldFailAfterMaxRetriesWhenFetchAvailableCurrencies() {
+        // Given
+        when(cryptoDataServiceClient.getAvailableCurrencies())
+                .thenThrow(new RetryableException(503, "Service Unavailable", Request.HttpMethod.GET, 0L, Request.create(Request.HttpMethod.GET, "http://example.com", Collections.emptyMap(), null, null, null)));
+
+        // When
+        scrapperService.scrapeBinanceApiMarketData();
+
+        // Then
+        int retryAttempts = (int) ReflectionTestUtils.getField(scrapperService, "retryAttempts");
+        verify(cryptoDataServiceClient, times(retryAttempts)).getAvailableCurrencies();
+        verify(restTemplate, never()).getForObject(anyString(), eq(BinanceCurrencyResponse.class));
+        verify(webSocketServiceClient, never()).pushScrappedDataForUpdateToWebSocketSessions(any());
+    }
+
+    @Test
+    void shouldRetryWebSocketPushMethodAndHandleFailure() {
+
+        // Given
+        ArgumentCaptor<ScrappedCurrencyUpdateRequest> requestCaptor = ArgumentCaptor.forClass(ScrappedCurrencyUpdateRequest.class);
+
+        BigDecimal btcLastPrice = BigDecimal.valueOf(62300, 421);
+
+        doThrow(new RuntimeException("Temporary Error"))
+                .doNothing()
+                .when(webSocketServiceClient).pushScrappedDataForUpdateToWebSocketSessions(any(ScrappedCurrencyUpdateRequest.class));
+
+        ScrappedCurrencyUpdateRequest dummyRequest = new ScrappedCurrencyUpdateRequest(Set.of(new ScrappedCurrency(BTCUSDT,btcLastPrice,234523452323L)), 1);
+
+        // When
+        scrapperService.executeWithRetry(() -> {
+            webSocketServiceClient.pushScrappedDataForUpdateToWebSocketSessions(dummyRequest);
+            return null;
+        },false, "WebSocket Push");
+
+        // Then
+        verify(webSocketServiceClient, times(2)).pushScrappedDataForUpdateToWebSocketSessions(requestCaptor.capture());
+        ScrappedCurrencyUpdateRequest capturedRequest = requestCaptor.getValue();
+        Set<ScrappedCurrency> capturedSet = capturedRequest.scrappedCurrencySet();
+
+        assertThat(capturedSet).hasSize(1);
+        capturedSet.forEach(request -> {
+            assertThat(request.symbol()).isEqualTo(BTCUSDT);
+        });
     }
 
 }

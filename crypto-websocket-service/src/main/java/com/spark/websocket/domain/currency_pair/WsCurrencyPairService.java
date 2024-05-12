@@ -1,6 +1,6 @@
 package com.spark.websocket.domain.currency_pair;
 
-import com.spark.feign_client.CryptoDataServiceClient;
+import com.spark.feign.client.CryptoDataServiceClient;
 import com.spark.models.response.AvailableCurrencyPairsResponse;
 import com.spark.models.response.CurrencyPairChartRateHistoryResponse;
 import com.spark.websocket.infrastructure.model.WebSocketEventMessageResponse;

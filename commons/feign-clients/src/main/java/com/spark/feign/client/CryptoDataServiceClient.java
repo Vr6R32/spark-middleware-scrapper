@@ -1,4 +1,4 @@
-package com.spark.feign_client;
+package com.spark.feign.client;
 
 import com.spark.models.request.ScrappedCurrencyUpdateRequest;
 import com.spark.models.response.AvailableCurrencyPairsResponse;
@@ -21,5 +21,5 @@ public interface CryptoDataServiceClient {
     CurrencyPairChartRateHistoryResponse getCurrencyPairLast24hRateHistory(@PathVariable("symbol") String symbol, @RequestParam(defaultValue = "Europe/Warsaw", required = false, name = "userZoneId") String userZoneId);
 
     @PostMapping("api/v1/management/currencies/scrapper/update")
-    void pushScrappedCurrencySetForUpdate(@RequestBody ScrappedCurrencyUpdateRequest request);
+    void pushScrappedCurrencySetForDataServiceUpdate(@RequestBody ScrappedCurrencyUpdateRequest request);
 }
