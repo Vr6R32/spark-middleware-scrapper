@@ -11,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/currencies")
+@CrossOrigin(origins = "http://localhost:4200")
 record CurrencyPairUserController(CurrencyPairFacade currencyPairFacade, CurrencyPairRateHistoryFacade currencyPairRateHistoryFacade) implements UserApi {
 
 

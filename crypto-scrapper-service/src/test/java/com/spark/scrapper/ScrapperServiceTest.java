@@ -13,8 +13,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -46,7 +48,6 @@ class ScrapperServiceTest {
     @Captor
     private ArgumentCaptor<ScrappedCurrencyUpdateRequest> captor;
 
-    @InjectMocks
     private ScrapperService scrapperService;
 
     @BeforeEach
@@ -97,12 +98,13 @@ class ScrapperServiceTest {
 
         ScrappedCurrencyUpdateRequest capturedRequest = captor.getValue();
         Set<ScrappedCurrency> capturedSet = capturedRequest.scrappedCurrencySet();
-        Set<ScrappedCurrency> expectedSet = new HashSet<>();
+        Set<ScrappedCurrency> expectedSet = Set.of(new ScrappedCurrency(BTCUSDT, btcLastPrice, Instant.now().toEpochMilli()), (new ScrappedCurrency(LTCUSDT, ltcLastPrice, Instant.now().toEpochMilli())));
 
-        expectedSet.add(new ScrappedCurrency(BTCUSDT, btcLastPrice, Instant.now().toEpochMilli()));
-        expectedSet.add(new ScrappedCurrency(LTCUSDT, ltcLastPrice, Instant.now().toEpochMilli()));
-
-        assertThat(capturedSet).usingElementComparatorIgnoringFields("timestamp").containsExactlyInAnyOrderElementsOf(expectedSet);
+        assertThat(capturedSet)
+                .usingRecursiveComparison()
+                .ignoringFields("timestamp")
+                .ignoringCollectionOrder()
+                .isEqualTo(expectedSet);
     }
 
     @Test
@@ -139,6 +141,17 @@ class ScrapperServiceTest {
                                         sc.symbol().equals(BTCUSDT) && sc.lastPrice().compareTo(btcLastPrice) == 0)
                 )
         );
+
+//        verify(webSocketServiceClient, times(1)).pushScrappedDataForUpdateToWebSocketSessions(captor.capture());
+//
+//        ScrappedCurrencyUpdateRequest request = captor.getValue();
+//
+//        assertThat(expectedScrappedCurrencyRequest)
+//                .usingRecursiveComparison()
+//                .ignoringFields("timeStamp")
+//                .ignoringCollectionOrder()
+//                .isEqualTo(request);
+
     }
 
 

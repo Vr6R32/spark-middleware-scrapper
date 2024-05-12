@@ -15,6 +15,22 @@ function fetchAvailableCurrenciesWebSocketEvent() {
     }
 }
 
+function fetchAllAvailableCurrenciesLatestRateWebSocketEvent() {
+    if (stompClient && stompClient.connected) {
+        stompClient.send('/ws/api/v1/lastAll', {}, null);
+    } else {
+        setTimeout(() => fetchAvailableCurrenciesWebSocketEvent(), 50);
+    }
+}
+
+function fetchLatestSpecifiedCurrencyRateHistory(symbol) {
+    if (stompClient && stompClient.connected) {
+        stompClient.send('/ws/api/v1/last/' + symbol, {}, null);
+    } else {
+        setTimeout(() => fetchAvailableCurrenciesWebSocketEvent(), 50);
+    }
+}
+
 
 function fetchAvailableCurrencies() {
     fetchAvailableCurrenciesWebSocketEvent();

@@ -13,7 +13,7 @@ public class ScrappedCurrencyMapper {
     /**
      * Maps a ScrappedCurrency object to a CurrencyPairSingleRateHistoryResponse.
      * @param scrappedCurrency Currency data retrieved from an external source.
-     * @param userZoneId Identifier of the user's time zone.
+     * @param userZoneId Identifier of the user's time zone needed to convert UTC timestamp value
      * @return A CurrencyPairSingleRateHistoryResponse object with requested currency data.
      */
 

@@ -10,10 +10,16 @@ let teal_color = 'rgb(105, 232, 192)';
 let red_color = 'rgb(255, 99, 132)';
 let gray_color = 'rgba(90,90,90,0.5)';
 let white_color = 'rgb(255, 255, 255)';
-
-
+let chartInitialData = {
+    symbol: null,
+    timeWindow: null,
+    rateHistory: [
+        { timestamp: null, value: null }
+    ]
+};
 
 document.addEventListener('DOMContentLoaded', function() {
+    initializeUpdateChart(chartInitialData,false);
     fetchAvailableCurrencies();
     currencySelectorListener();
     tickRateSelectorListener();
@@ -75,15 +81,11 @@ function toggleDragZoom() {
 
 
 function initializeUpdateChart(data, resetzoom, isUpdate = false) {
+
     currentData = data;
-
-    if (!useSingleColor) {
-        calculateColorPrediction();
-    }
-
+    if (!useSingleColor) calculateColorPrediction();
     const labels = data.rateHistory.map(entry => new Date(entry.timestamp));
     const values = data.rateHistory.map(entry => entry.value);
-
 
     const getBorderColor = (ctx) => {
         if (useSingleColor) {
@@ -109,7 +111,9 @@ function initializeUpdateChart(data, resetzoom, isUpdate = false) {
 
     if (coinChart) {
         if(resetzoom) resetChartZoom();
+
         coinChart.data.labels = labels;
+        coinChart.options.plugins.title.text = data.timeWindow + ' Price Chart';
         coinChart.data.datasets[0].data = values;
         coinChart.data.datasets[0].label = '(' + data.symbol + ') Price';
 
@@ -155,16 +159,16 @@ function initializeUpdateChart(data, resetzoom, isUpdate = false) {
                             // label: (ttItem) => (`${ttItem.formattedValue}` + '$'),
                             label: (ctx) => (`${ctx.dataset.label}: ${ctx.raw}` + '$'),
                             title: (title) => (`Date: ${title[0].label}`),
-                            //     labelColor: function() {
-                            //         return {
-                            //             backgroundColor: black_color_solid,
-                            //             borderWidth: 2,
-                            //             borderRadius: 2,
-                            //         };
-                            //     },
-                            //     labelTextColor: function() {
-                            //         return white_color;
-                            //     },
+                                // labelColor: function() {
+                                //     return {
+                                //         backgroundColor: black_color_solid,
+                                //         borderWidth: 2,
+                                //         borderRadius: 2,
+                                //     };
+                                // },
+                                // labelTextColor: function() {
+                                //     return white_color;
+                                // },
                         }
                     },
                     title: {
@@ -181,14 +185,13 @@ function initializeUpdateChart(data, resetzoom, isUpdate = false) {
                             mode: 'xy'
                         },
                         zoom: {
-                            onZoom: function ({ chart }) {
-                                // coinChart.options.plugins.zoom.pan.enabled = false;
-                                // coinChart.options.plugins.zoom.zoom.drag.enabled = false;
-                                // coinChart.options.plugins.zoom.zoom.wheel.enabled = false;
-                            },
-                            onZoomComplete: function ({ chart }) {
-                                //
-                            },
+                            // onZoom: function ({ chart }) {
+                            //     // coinChart.options.plugins.zoom.pan.enabled = false;
+                            //     // coinChart.options.plugins.zoom.zoom.drag.enabled = false;
+                            //     // coinChart.options.plugins.zoom.zoom.wheel.enabled = false;
+                            // },
+                            // onZoomComplete: function ({ chart }) {
+                            // },
                             wheel: {
                                 mode: 'x',
                                 enabled: true,
@@ -199,7 +202,7 @@ function initializeUpdateChart(data, resetzoom, isUpdate = false) {
                             },
                             drag: {
                                 enabled: false,
-                                mode: 'xy',
+                                mode: 'x',
                             }
                         }
                     }
