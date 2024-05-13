@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <springProperty scope="context" name="appName" source="spring.application.name" defaultValue="defaultAppName"/>
+    <springProperty scope="context" name="instanceId" source="eureka.instance.instance-id" defaultValue="unregistered"/>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder>
+            <pattern>%magenta(%d{dd-MM-yyyy HH:mm:ss.SSS}) %highlight(%-5level) %green([${appName}]) [%boldBlue(%15.15thread)] -> %boldYellow(%30.30logger{0})  TRACE_ID: [%cyan(%X{traceId})] SPAN_ID: [%cyan(%X{spanId})] : %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>/var/log/spring/${appName}.%d{yyyy-MM-dd}.log</fileNamePattern>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%magenta(%d{dd-MM-yyyy HH:mm:ss.SSS}) %highlight(%-5level) %green([${appName}]) [%boldBlue(%15.15thread)] -> %boldYellow(%30.30logger{0})  TRACE_ID: [%cyan(%X{traceId})] SPAN_ID: [%cyan(%X{spanId})] : %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>
