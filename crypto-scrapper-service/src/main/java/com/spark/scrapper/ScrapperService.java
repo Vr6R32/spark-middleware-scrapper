@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -58,8 +59,7 @@ class ScrapperService {
                 .map(currencyPairDTO -> CompletableFuture.runAsync(() -> executeWithRetryOptional(() -> {
                     BinanceCurrencyResponse response = restTemplate.getForObject(binanceApiUrl + currencyPairDTO.symbol(), BinanceCurrencyResponse.class);
                     assert response != null;
-                    scrappedCurrencySet.add(new ScrappedCurrency(response.symbol(), response.lastPrice(), Instant.now().toEpochMilli()));
-                    return null;
+                    return scrappedCurrencySet.add(new ScrappedCurrency(response.symbol(), response.lastPrice(), Instant.now().toEpochMilli()));
                 }, "Fetch Data for " + currencyPairDTO.symbol())))
                 .toList();
 
@@ -69,15 +69,11 @@ class ScrapperService {
 
         ScrappedCurrencyUpdateRequest request = new ScrappedCurrencyUpdateRequest(scrappedCurrencySet, currenciesToScrape.size());
 
-        CompletableFuture<Void> websocketScrappedUpdate = executeWithRetryVoidAsynchronous(() -> {
-            webSocketServiceClient.pushScrappedDataForUpdateToWebSocketSessions(request);
-            return null;
-        }, "WebSocket Push");
+        CompletableFuture<Void> websocketScrappedUpdate = executeWithRetryVoidAsynchronous(
+                consumer -> webSocketServiceClient.pushScrappedDataForUpdateToWebSocketSessions(request), "WebSocket Push");
 
-        CompletableFuture<Void> dataServiceScrappedUpdate = executeWithRetryVoidAsynchronous(() -> {
-            cryptoDataServiceClient.pushScrappedCurrencySetForDataServiceUpdate(request);
-            return null;
-        }, "Update Currency Set");
+        CompletableFuture<Void> dataServiceScrappedUpdate = executeWithRetryVoidAsynchronous(
+                consumer -> cryptoDataServiceClient.pushScrappedCurrencySetForDataServiceUpdate(request), "Update Currency Set");
 
         CompletableFuture.allOf(websocketScrappedUpdate, dataServiceScrappedUpdate).join();
     }
@@ -107,13 +103,13 @@ class ScrapperService {
         return Optional.empty();
     }
 
-    public CompletableFuture<Void> executeWithRetryVoidAsynchronous(Supplier<?> operation, String logContext) {
-        return CompletableFuture.supplyAsync(() -> {
+    public CompletableFuture<Void> executeWithRetryVoidAsynchronous(Consumer<Void> operation, String logContext) {
+        return CompletableFuture.runAsync(() -> {
             int attempts = 0;
             while (attempts < retryAttempts) {
                 try {
-                    operation.get();
-                    return null;
+                    operation.accept(null);
+                    break;
                 } catch (Exception e) {
                     attempts++;
                     log.warn("{} - Retry {} of {}: {}", logContext, attempts, retryAttempts, e.getMessage());
@@ -129,7 +125,6 @@ class ScrapperService {
                     }
                 }
             }
-            return null;
         });
     }
 }

@@ -185,9 +185,8 @@ class ScrapperServiceTest {
         ScrappedCurrencyUpdateRequest dummyRequest = new ScrappedCurrencyUpdateRequest(Set.of(new ScrappedCurrency("BTCUSDT", btcLastPrice, 234523452323L)), 1);
 
         // When
-        CompletableFuture<Void> testFuture = scrapperService.executeWithRetryVoidAsynchronous(() -> {
+        CompletableFuture<Void> testFuture = scrapperService.executeWithRetryVoidAsynchronous(consumer -> {
             webSocketServiceClient.pushScrappedDataForUpdateToWebSocketSessions(dummyRequest);
-            return null;
         }, "WebSocket Push");
         testFuture.join();
 
