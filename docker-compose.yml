@@ -1,0 +1,59 @@
+services:
+
+  scrapper-service:
+    image: michaelkey/crypto-scrapper-service:0.0.1-SNAPSHOT
+    container_name: scrapper-service
+    ports:
+      - "9000:9000"
+    environment:
+      SERVER_PORT: 9000
+      SPRING_PROFILES_ACTIVE: docker
+      TZ: Europe/Warsaw
+    networks:
+      - spring
+    restart: unless-stopped
+
+  data-service:
+    image: michaelkey/crypto-data-service:0.0.1-SNAPSHOT
+    container_name: data-service
+    ports:
+      - "9001:9001"
+    environment:
+      SERVER_PORT: 9001
+      SPRING_PROFILES_ACTIVE: docker
+      TZ: Europe/Warsaw
+    volumes:
+      - ./db/sqlite.db:/db/sqlite.db
+    networks:
+      - spring
+    restart: unless-stopped
+
+  websocket-service:
+    image: michaelkey/crypto-websocket-service:0.0.1-SNAPSHOT
+    container_name: websocket-service
+    ports:
+      - "9002:9002"
+    environment:
+      SERVER_PORT: 9002
+      SPRING_PROFILES_ACTIVE: docker
+      TZ: Europe/Warsaw
+    networks:
+      - spring
+    restart: unless-stopped
+
+  frontend-service:
+    image: michaelkey/crypto-frontend-service:0.0.1-SNAPSHOT
+    container_name: conversation-service
+    ports:
+      - "4200:4200"
+    environment:
+      SERVER_PORT: 4200
+      SPRING_PROFILES_ACTIVE: docker
+      TZ: Europe/Warsaw
+    networks:
+      - spring
+    restart: unless-stopped
+
+networks:
+  spring:
+    driver: bridge

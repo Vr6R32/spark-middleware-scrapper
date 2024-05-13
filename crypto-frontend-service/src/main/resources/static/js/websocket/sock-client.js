@@ -1,4 +1,5 @@
 let stompClient;
+let isReconnecting = false;
 
 document.addEventListener('DOMContentLoaded', function() {
     connectSocket();
@@ -16,12 +17,19 @@ function connectSocket() {
             });
         }
 
-        // TODO SET INJECT URL BY VALUE FROM APP.YML
-        let socketUrl = `http://localhost:9002/websocket?timezone=${getUserTimeZone()}`;
-        const socket = new SockJS(socketUrl);
+        let socketUrl = document.getElementById('websocketUrl').value;
+        let socketTimeZoneUrl = `${socketUrl}?timezone=${getUserTimeZone()}`;
+
+        const socket = new SockJS(socketTimeZoneUrl);
         stompClient = Stomp.over(socket);
 
         stompClient.connect({}, function (frame) {
+
+            if (isReconnecting) {
+                fetchCoinRateHistory(selectedSymbol);
+                isReconnecting = false;
+            }
+
             reconnectAttempts = 0;
 
             stompClient.debug = function (msg) {
@@ -43,6 +51,7 @@ function connectSocket() {
     function handleReconnect() {
         if (reconnectAttempts < maxReconnectAttempts) {
             reconnectAttempts++;
+            isReconnecting = true;
             console.log(`Attempting to reconnect (${reconnectAttempts}/${maxReconnectAttempts})...`);
             setTimeout(setupWebSocket, reconnectInterval);
         } else {

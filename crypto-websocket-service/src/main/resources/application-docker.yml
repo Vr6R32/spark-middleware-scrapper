@@ -2,6 +2,7 @@ server:
   port: 9002
 
 spring:
+
   application:
     name: crypto-websocket-service
   jackson:
