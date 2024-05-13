@@ -19,34 +19,50 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
         <assertj-core.version>3.23.1</assertj-core.version>
         <mockito-core.version>4.9.0</mockito-core.version>
+        <spring-web.version>6.1.6</spring-web.version>
     </properties>
 
     <dependencies>
+
+        <!--@@@@@@@@@@@@@@@@@@@@@@@@@ WEB MVC / WEBSOCKET  @@@@@@@@@@@@@@@@@@@@@@@@@@-->
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${spring-web.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+
+        <!--@@@@@@@@@@@@@@@@@@@@@@@@@ CUSTOM INTERNAL DEPENDENCIES @@@@@@@@@@@@@@@@@@@@@@@@@@-->
+
         <dependency>
             <groupId>com.spark</groupId>
             <artifactId>feign-clients</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+
         <dependency>
             <groupId>com.spark</groupId>
             <artifactId>utils</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+
         <dependency>
             <groupId>com.spark</groupId>
             <artifactId>monitoring-stack-dependencies</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
 
         <!--@@@@@@@@@@@@@@@@@@@@@@@@@ TEST DEPENDENCIES @@@@@@@@@@@@@@@@@@@@@@@@@@-->
