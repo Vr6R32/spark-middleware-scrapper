@@ -25,3 +25,32 @@ spring:
     enabled: true
     drop-first: false
     change-log: classpath:db/changelog/db.changelog-master.xml
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    preferIpAddress: true
+
+management:
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+  observations:
+    key-values:
+      application: data-service
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+      base-path: /actuator
+  endpoint:
+    metrics:
+      enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true

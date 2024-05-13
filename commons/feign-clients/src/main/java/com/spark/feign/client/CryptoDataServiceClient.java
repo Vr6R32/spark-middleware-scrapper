@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 
-@FeignClient(url = "localhost:9001", name = "crypto-data-service")
+@FeignClient(value = "data-service")
 public interface CryptoDataServiceClient {
 
     @GetMapping("api/v1/currencies")

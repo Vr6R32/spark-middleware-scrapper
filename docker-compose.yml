@@ -9,6 +9,8 @@ services:
       SERVER_PORT: 9000
       SPRING_PROFILES_ACTIVE: docker
       TZ: Europe/Warsaw
+    volumes:
+      - api-logs:/var/log/spring
     networks:
       - spring
     restart: unless-stopped
@@ -24,6 +26,7 @@ services:
       TZ: Europe/Warsaw
     volumes:
       - ./db/sqlite.db:/db/sqlite.db
+      - api-logs:/var/log/spring
     networks:
       - spring
     restart: unless-stopped
@@ -37,6 +40,8 @@ services:
       SERVER_PORT: 9002
       SPRING_PROFILES_ACTIVE: docker
       TZ: Europe/Warsaw
+    volumes:
+      - api-logs:/var/log/spring
     networks:
       - spring
     restart: unless-stopped
@@ -50,6 +55,38 @@ services:
       SERVER_PORT: 4200
       SPRING_PROFILES_ACTIVE: docker
       TZ: Europe/Warsaw
+    volumes:
+      - api-logs:/var/log/spring
+    networks:
+      - spring
+    restart: unless-stopped
+
+  api-gateway:
+    image: michaelkey/api-gateway:0.0.1-SNAPSHOT
+    container_name: api-gateway
+    ports:
+      - "9999:9999"
+    environment:
+      SERVER_PORT: 9999
+      SPRING_PROFILES_ACTIVE: docker
+    volumes:
+      - api-logs:/var/log/spring
+    networks:
+      - spring
+    depends_on:
+      - eureka-server
+    restart: unless-stopped
+
+  eureka-server:
+    image: michaelkey/eureka-server:0.0.1-SNAPSHOT
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    environment:
+      SERVER_PORT: 8761
+      SPRING_PROFILES_ACTIVE: docker
+    volumes:
+      - api-logs:/var/log/spring
     networks:
       - spring
     restart: unless-stopped

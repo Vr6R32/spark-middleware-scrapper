@@ -157,7 +157,7 @@ class ScrapperServiceTest {
     void shouldFailAfterMaxRetriesWhenFetchAvailableCurrencies() {
         // Given
         when(cryptoDataServiceClient.getAvailableCurrencies())
-                .thenThrow(new RetryableException(503, "Service Unavailable", Request.HttpMethod.GET, 0L, Request.create(Request.HttpMethod.GET, "http://example.com", Collections.emptyMap(), null, null, null)));
+                .thenThrow(new RetryableException(503, "Service Unavailable", Request.HttpMethod.GET, 0L, Request.create(Request.HttpMethod.GET, "https://example.com", Collections.emptyMap(), null, null, null)));
 
         // When
         scrapperService.asynchronouslyScrapeBinanceApiMarketDataAndPushDataUpdateRequest();
@@ -172,7 +172,7 @@ class ScrapperServiceTest {
     }
 
     @Test
-    void shouldRetryWebSocketPushMethodAndHandleFailure() throws Exception {
+    void shouldRetryWebSocketPushMethodAndHandleFailure() {
         // Given
         ArgumentCaptor<ScrappedCurrencyUpdateRequest> requestCaptor = ArgumentCaptor.forClass(ScrappedCurrencyUpdateRequest.class);
 
@@ -185,9 +185,8 @@ class ScrapperServiceTest {
         ScrappedCurrencyUpdateRequest dummyRequest = new ScrappedCurrencyUpdateRequest(Set.of(new ScrappedCurrency("BTCUSDT", btcLastPrice, 234523452323L)), 1);
 
         // When
-        CompletableFuture<Void> testFuture = scrapperService.executeWithRetryVoidAsynchronous(consumer -> {
-            webSocketServiceClient.pushScrappedDataForUpdateToWebSocketSessions(dummyRequest);
-        }, "WebSocket Push");
+        CompletableFuture<Void> testFuture = scrapperService.executeWithRetryVoidAsynchronous(
+                consumer -> webSocketServiceClient.pushScrappedDataForUpdateToWebSocketSessions(dummyRequest), "WebSocket Push");
         testFuture.join();
 
         // Then

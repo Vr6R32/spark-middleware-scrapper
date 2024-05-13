@@ -18,3 +18,32 @@ scheduler:
   retryFetchIntervalMilliseconds: 1000
   retryFetchAttempts: 3
 
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    preferIpAddress: true
+
+management:
+  zipkin:
+    tracing:
+      endpoint: http://zipkin:9411/api/v2/spans
+  observations:
+    key-values:
+      application: scrapper-service
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+      base-path: /actuator
+  endpoint:
+    metrics:
+      enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+

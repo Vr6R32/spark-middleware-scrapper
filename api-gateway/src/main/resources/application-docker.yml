@@ -1,11 +1,13 @@
 server:
-  port: 9002
+  port: 9999
 
 spring:
+  main:
+    web-application-type: reactive
   application:
-    name: websocket-service
-  jackson:
-    time-zone: Europe/Warsaw
+    name: api-gateway
+  banner:
+    location: classpath:banner.txt
 
 eureka:
   client:
@@ -22,7 +24,7 @@ management:
       endpoint: http://zipkin:9411/api/v2/spans
   observations:
     key-values:
-      application: websocket-service
+      application: api-gateway
   endpoints:
     web:
       exposure:

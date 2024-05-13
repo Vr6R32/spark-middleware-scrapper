@@ -1,20 +1,16 @@
-server:
-  port: 9002
-
 spring:
   application:
-    name: websocket-service
-  jackson:
-    time-zone: Europe/Warsaw
+    name: eureka-server
+  banner:
+    location: classpath:banner.txt
+
+server:
+  port: 8761
 
 eureka:
   client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka
-    fetch-registry: true
-    register-with-eureka: true
-  instance:
-    preferIpAddress: true
+    fetch-registry: false
+    register-with-eureka: false
 
 management:
   zipkin:
@@ -22,7 +18,7 @@ management:
       endpoint: http://localhost:9411/api/v2/spans
   observations:
     key-values:
-      application: websocket-service
+      application: eureka-server
   endpoints:
     web:
       exposure:

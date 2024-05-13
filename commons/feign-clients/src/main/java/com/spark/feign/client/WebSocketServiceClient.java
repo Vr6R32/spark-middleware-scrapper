@@ -5,7 +5,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(url = "localhost:9002", name = "crypto-websocket-service")
+@FeignClient(value = "websocket-service")
 public interface WebSocketServiceClient {
 
     @PutMapping("api/v1/events/scrapper/update")
