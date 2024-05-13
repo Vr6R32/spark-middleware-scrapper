@@ -17,6 +17,7 @@ import java.time.*;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -40,11 +41,10 @@ class ScrapperService {
     private final CryptoDataServiceClient cryptoDataServiceClient;
 
     @Scheduled(fixedRateString = "${scheduler.intervalMilliseconds}")
-    public void scrapeBinanceApiMarketData() {
+    public void scrapeBinanceApiMarketDataAndPushDataUpdateRequest() {
 
-        Optional<Set<CurrencyPairDTO>> optionalCurrenciesToScrape = executeWithRetry(
-                () -> cryptoDataServiceClient.getAvailableCurrencies().currencies(), false, "Fetch Available Currencies");
-
+        Optional<Set<CurrencyPairDTO>> optionalCurrenciesToScrape = executeWithRetryOptional(
+                () -> cryptoDataServiceClient.getAvailableCurrencies().currencies(), "Fetch Available Currencies");
 
         if (optionalCurrenciesToScrape.isEmpty()) {
             log.error("Failed to fetch currencies. Exiting method.");
@@ -52,32 +52,40 @@ class ScrapperService {
         }
 
         Set<CurrencyPairDTO> currenciesToScrape = optionalCurrenciesToScrape.get();
-
         Set<ScrappedCurrency> scrappedCurrencySet = new HashSet<>();
+
         for (CurrencyPairDTO currencyPairDTO : currenciesToScrape) {
-            executeWithRetry(() -> {
+            executeWithRetryOptional(() -> {
                 BinanceCurrencyResponse response = restTemplate.getForObject(binanceApiUrl + currencyPairDTO.symbol(), BinanceCurrencyResponse.class);
                 assert response != null;
                 scrappedCurrencySet.add(new ScrappedCurrency(response.symbol(), response.lastPrice(), Instant.now().toEpochMilli()));
                 return null;
-            }, true, "Fetch Data for " + currencyPairDTO.symbol());
+            }, "Fetch Data for " + currencyPairDTO.symbol());
         }
 
         log.info("SUCCESSFULLY SCRAPPED [{}] OF [{}] AVAILABLE CURRENCY PAIRS", scrappedCurrencySet.size(), currenciesToScrape.size());
 
         ScrappedCurrencyUpdateRequest request = new ScrappedCurrencyUpdateRequest(scrappedCurrencySet, currenciesToScrape.size());
-        executeWithRetry(() -> { webSocketServiceClient.pushScrappedDataForUpdateToWebSocketSessions(request); return null; }, true, "WebSocket Push");
-        executeWithRetry(() -> { cryptoDataServiceClient.pushScrappedCurrencySetForDataServiceUpdate(request); return null; }, true, "Update Currency Set");
+
+        CompletableFuture<Void> websocketScrappedUpdate = executeWithRetryVoidAsynchronous(() -> {
+            webSocketServiceClient.pushScrappedDataForUpdateToWebSocketSessions(request);
+            return null;
+        }, "WebSocket Push");
+
+        CompletableFuture<Void> dataServiceScrappedUpdate = executeWithRetryVoidAsynchronous(() -> {
+            cryptoDataServiceClient.pushScrappedCurrencySetForDataServiceUpdate(request);
+            return null;
+        }, "Update Currency Set");
+
+        CompletableFuture.allOf(websocketScrappedUpdate, dataServiceScrappedUpdate).join();
     }
 
-    <T> Optional<T> executeWithRetry(Supplier<T> operation, boolean isVoid, String logContext) {
+    <T> Optional<T> executeWithRetryOptional(Supplier<T> operation, String logContext) {
         int attempts = 0;
         while (attempts < retryAttempts) {
             try {
                 T result = operation.get();
-                if (!isVoid) return Optional.ofNullable(result);
-
-                return Optional.empty();
+                return Optional.ofNullable(result);
             } catch (Exception e) {
                 attempts++;
                 log.warn("{} - Retry {} of {}: {}", logContext, attempts, retryAttempts, e.getMessage());
@@ -90,10 +98,36 @@ class ScrapperService {
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
                     log.error("Thread interrupted during retry of {}", logContext, ie);
-                    throw new RuntimeException(ie.getMessage());
+                    throw new ScrapperThreadInterruptException(ie.getMessage());
                 }
             }
         }
         return Optional.empty();
+    }
+
+    public CompletableFuture<Void> executeWithRetryVoidAsynchronous(Supplier<?> operation, String logContext) {
+        return CompletableFuture.supplyAsync(() -> {
+            int attempts = 0;
+            while (attempts < retryAttempts) {
+                try {
+                    operation.get();
+                    return null;
+                } catch (Exception e) {
+                    attempts++;
+                    log.warn("{} - Retry {} of {}: {}", logContext, attempts, retryAttempts, e.getMessage());
+                    if (attempts >= retryAttempts) {
+                        log.error("Failed after {} attempts due to {}", attempts, e.toString());
+                        break;
+                    }
+                    try {
+                        MILLISECONDS.sleep(retryInterval);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        throw new ScrapperThreadInterruptException(ie.getMessage());
+                    }
+                }
+            }
+            return null;
+        });
     }
 }

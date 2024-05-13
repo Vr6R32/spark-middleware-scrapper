@@ -11,23 +11,20 @@ import feign.Request;
 import feign.RetryableException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
-
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.*;
+import java.util.Collections;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -87,7 +84,7 @@ class ScrapperServiceTest {
 
         // When
 
-        scrapperService.scrapeBinanceApiMarketData();
+        scrapperService.scrapeBinanceApiMarketDataAndPushDataUpdateRequest();
 
         // Then
 
@@ -126,7 +123,7 @@ class ScrapperServiceTest {
                 .thenReturn(binanceResponseBTC);
 
         // When
-        scrapperService.scrapeBinanceApiMarketData();
+        scrapperService.scrapeBinanceApiMarketDataAndPushDataUpdateRequest();
 
         // Then
         verify(restTemplate, times(2)).getForObject(anyString(), eq(BinanceCurrencyResponse.class));
@@ -162,7 +159,7 @@ class ScrapperServiceTest {
                 .thenThrow(new RetryableException(503, "Service Unavailable", Request.HttpMethod.GET, 0L, Request.create(Request.HttpMethod.GET, "http://example.com", Collections.emptyMap(), null, null, null)));
 
         // When
-        scrapperService.scrapeBinanceApiMarketData();
+        scrapperService.scrapeBinanceApiMarketDataAndPushDataUpdateRequest();
 
         // Then
         int retryAttempts = (int) ReflectionTestUtils.getField(scrapperService, "retryAttempts");
@@ -186,10 +183,10 @@ class ScrapperServiceTest {
         ScrappedCurrencyUpdateRequest dummyRequest = new ScrappedCurrencyUpdateRequest(Set.of(new ScrappedCurrency(BTCUSDT,btcLastPrice,234523452323L)), 1);
 
         // When
-        scrapperService.executeWithRetry(() -> {
+        scrapperService.executeWithRetryOptional(() -> {
             webSocketServiceClient.pushScrappedDataForUpdateToWebSocketSessions(dummyRequest);
             return null;
-        },false, "WebSocket Push");
+        }, "WebSocket Push");
 
         // Then
         verify(webSocketServiceClient, times(2)).pushScrappedDataForUpdateToWebSocketSessions(requestCaptor.capture());
