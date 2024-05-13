@@ -19,6 +19,9 @@ eureka:
     preferIpAddress: true
 
 management:
+  tracing:
+    sampling:
+      probability: 0.0 # 0.0 SET FOR DISABLING ZIPKIN IN LOCALHOST DEV ENVIRONMENT
   zipkin:
     tracing:
       endpoint: http://localhost:9411/api/v2/spans

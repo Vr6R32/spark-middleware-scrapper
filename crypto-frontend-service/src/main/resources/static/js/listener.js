@@ -7,9 +7,9 @@ function colorButtonListener() {
     });
 }
 
-function tickRateSelectorListener() {
+function chartTimeScaleSelectorListener() {
 
-    const timeUnits = [
+    const timeScaleUnits = [
         'auto',
         'minute',
         'hour',
@@ -20,20 +20,48 @@ function tickRateSelectorListener() {
         'year'
     ];
 
-    const currencyTickRateSelector = document.getElementById('currency-tick-rate-selector');
+    const chartTimeScaleSelectorListener = document.getElementById('chart-time-scale-selector');
 
-    timeUnits.forEach(option => {
+    timeScaleUnits.forEach(option => {
         const opt = document.createElement('option');
         opt.value = option;
         opt.textContent = option.charAt(0).toUpperCase() + option.slice(1);
-        currencyTickRateSelector.appendChild(opt);
+        chartTimeScaleSelectorListener.appendChild(opt);
         if (option === 'auto') {
             opt.selected = true;
         }
     });
 
-    currencyTickRateSelector.addEventListener('change', function() {
-        updateChartTimeUnit(this.value);
+    chartTimeScaleSelectorListener.addEventListener('change', function() {
+        updateChartTimeScaleUnit(this.value);
+    });
+}
+
+function currencyTimeWindowSelectorListener() {
+
+    const timeWindowUnits = [
+        '1hour',
+        '24h',
+        'week',
+        'month',
+        'quarter',
+        'year'
+    ];
+
+    const currencyTimeWindowSelectorListener = document.getElementById('currency-time-window-selector');
+
+    timeWindowUnits.forEach(option => {
+        const opt = document.createElement('option');
+        opt.value = option;
+        opt.textContent = option.charAt(0).toUpperCase() + option.slice(1);
+        currencyTimeWindowSelectorListener.appendChild(opt);
+        if (option === '24h') {
+            opt.selected = true;
+        }
+    });
+
+    currencyTimeWindowSelectorListener.addEventListener('change', function() {
+        fetchCoinRateHistory(selectedSymbol);
     });
 
 }

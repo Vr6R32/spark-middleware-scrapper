@@ -15,7 +15,8 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeUpdateChart(null,false);
     fetchAvailableCurrencies();
     currencySelectorListener();
-    tickRateSelectorListener();
+    chartTimeScaleSelectorListener();
+    currencyTimeWindowSelectorListener();
     resetZoomListener();
     windowResizeListener();
     colorButtonListener();
@@ -47,7 +48,7 @@ function resetChartZoom() {
     }
 }
 
-function updateChartTimeUnit(unit) {
+function updateChartTimeScaleUnit(unit) {
     if (coinChart) {
         if (unit==='auto') {
             coinChart.options.scales.x.time.unit = '';
