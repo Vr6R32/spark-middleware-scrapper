@@ -14,10 +14,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.*;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -41,8 +42,7 @@ class ScrapperService {
     private final CryptoDataServiceClient cryptoDataServiceClient;
 
     @Scheduled(fixedRateString = "${scheduler.intervalMilliseconds}")
-    public void scrapeBinanceApiMarketDataAndPushDataUpdateRequest() {
-
+    public void asynchronouslyScrapeBinanceApiMarketDataAndPushDataUpdateRequest() {
         Optional<Set<CurrencyPairDTO>> optionalCurrenciesToScrape = executeWithRetryOptional(
                 () -> cryptoDataServiceClient.getAvailableCurrencies().currencies(), "Fetch Available Currencies");
 
@@ -52,16 +52,18 @@ class ScrapperService {
         }
 
         Set<CurrencyPairDTO> currenciesToScrape = optionalCurrenciesToScrape.get();
-        Set<ScrappedCurrency> scrappedCurrencySet = new HashSet<>();
+        Set<ScrappedCurrency> scrappedCurrencySet = ConcurrentHashMap.newKeySet();
 
-        for (CurrencyPairDTO currencyPairDTO : currenciesToScrape) {
-            executeWithRetryOptional(() -> {
-                BinanceCurrencyResponse response = restTemplate.getForObject(binanceApiUrl + currencyPairDTO.symbol(), BinanceCurrencyResponse.class);
-                assert response != null;
-                scrappedCurrencySet.add(new ScrappedCurrency(response.symbol(), response.lastPrice(), Instant.now().toEpochMilli()));
-                return null;
-            }, "Fetch Data for " + currencyPairDTO.symbol());
-        }
+        List<CompletableFuture<Void>> scrappedCompletableFutureCurrencies = currenciesToScrape.stream()
+                .map(currencyPairDTO -> CompletableFuture.runAsync(() -> executeWithRetryOptional(() -> {
+                    BinanceCurrencyResponse response = restTemplate.getForObject(binanceApiUrl + currencyPairDTO.symbol(), BinanceCurrencyResponse.class);
+                    assert response != null;
+                    scrappedCurrencySet.add(new ScrappedCurrency(response.symbol(), response.lastPrice(), Instant.now().toEpochMilli()));
+                    return null;
+                }, "Fetch Data for " + currencyPairDTO.symbol())))
+                .toList();
+
+        CompletableFuture.allOf(scrappedCompletableFutureCurrencies.toArray(new CompletableFuture[0])).join();
 
         log.info("SUCCESSFULLY SCRAPPED [{}] OF [{}] AVAILABLE CURRENCY PAIRS", scrappedCurrencySet.size(), currenciesToScrape.size());
 

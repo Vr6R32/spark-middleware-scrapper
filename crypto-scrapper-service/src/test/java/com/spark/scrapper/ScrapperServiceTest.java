@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -84,7 +85,7 @@ class ScrapperServiceTest {
 
         // When
 
-        scrapperService.scrapeBinanceApiMarketDataAndPushDataUpdateRequest();
+        scrapperService.asynchronouslyScrapeBinanceApiMarketDataAndPushDataUpdateRequest();
 
         // Then
 
@@ -123,7 +124,7 @@ class ScrapperServiceTest {
                 .thenReturn(binanceResponseBTC);
 
         // When
-        scrapperService.scrapeBinanceApiMarketDataAndPushDataUpdateRequest();
+        scrapperService.asynchronouslyScrapeBinanceApiMarketDataAndPushDataUpdateRequest();
 
         // Then
         verify(restTemplate, times(2)).getForObject(anyString(), eq(BinanceCurrencyResponse.class));
@@ -159,18 +160,19 @@ class ScrapperServiceTest {
                 .thenThrow(new RetryableException(503, "Service Unavailable", Request.HttpMethod.GET, 0L, Request.create(Request.HttpMethod.GET, "http://example.com", Collections.emptyMap(), null, null, null)));
 
         // When
-        scrapperService.scrapeBinanceApiMarketDataAndPushDataUpdateRequest();
+        scrapperService.asynchronouslyScrapeBinanceApiMarketDataAndPushDataUpdateRequest();
 
         // Then
-        int retryAttempts = (int) ReflectionTestUtils.getField(scrapperService, "retryAttempts");
+        Object retryAttemptsObject = ReflectionTestUtils.getField(scrapperService, "retryAttempts");
+        assert retryAttemptsObject != null;
+        int retryAttempts = (int) retryAttemptsObject;
         verify(cryptoDataServiceClient, times(retryAttempts)).getAvailableCurrencies();
         verify(restTemplate, never()).getForObject(anyString(), eq(BinanceCurrencyResponse.class));
         verify(webSocketServiceClient, never()).pushScrappedDataForUpdateToWebSocketSessions(any());
     }
 
     @Test
-    void shouldRetryWebSocketPushMethodAndHandleFailure() {
-
+    void shouldRetryWebSocketPushMethodAndHandleFailure() throws Exception {
         // Given
         ArgumentCaptor<ScrappedCurrencyUpdateRequest> requestCaptor = ArgumentCaptor.forClass(ScrappedCurrencyUpdateRequest.class);
 
@@ -180,13 +182,14 @@ class ScrapperServiceTest {
                 .doNothing()
                 .when(webSocketServiceClient).pushScrappedDataForUpdateToWebSocketSessions(any(ScrappedCurrencyUpdateRequest.class));
 
-        ScrappedCurrencyUpdateRequest dummyRequest = new ScrappedCurrencyUpdateRequest(Set.of(new ScrappedCurrency(BTCUSDT,btcLastPrice,234523452323L)), 1);
+        ScrappedCurrencyUpdateRequest dummyRequest = new ScrappedCurrencyUpdateRequest(Set.of(new ScrappedCurrency("BTCUSDT", btcLastPrice, 234523452323L)), 1);
 
         // When
-        scrapperService.executeWithRetryOptional(() -> {
+        CompletableFuture<Void> testFuture = scrapperService.executeWithRetryVoidAsynchronous(() -> {
             webSocketServiceClient.pushScrappedDataForUpdateToWebSocketSessions(dummyRequest);
             return null;
         }, "WebSocket Push");
+        testFuture.join();
 
         // Then
         verify(webSocketServiceClient, times(2)).pushScrappedDataForUpdateToWebSocketSessions(requestCaptor.capture());
@@ -194,9 +197,9 @@ class ScrapperServiceTest {
         Set<ScrappedCurrency> capturedSet = capturedRequest.scrappedCurrencySet();
 
         assertThat(capturedSet).hasSize(1);
-        capturedSet.forEach(request -> {
-            assertThat(request.symbol()).isEqualTo(BTCUSDT);
+        capturedSet.forEach(scrappedCurrency -> {
+            assertThat(scrappedCurrency.symbol()).isEqualTo("BTCUSDT");
+            assertThat(scrappedCurrency.lastPrice()).isEqualByComparingTo(btcLastPrice);
         });
     }
-
 }
