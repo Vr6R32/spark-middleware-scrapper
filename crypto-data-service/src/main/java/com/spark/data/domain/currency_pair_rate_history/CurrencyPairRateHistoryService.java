@@ -19,12 +19,13 @@ import java.util.Set;
 import static com.spark.data.domain.currency_pair.CurrencyPairException.SYMBOL_IS_NOT_AVAILABLE;
 import static com.spark.data.domain.currency_pair_rate_history.CurrencyPairRateHistoryMapper.mapCurrencyPairRateHistoryToChartResponse;
 import static com.spark.data.domain.currency_pair_rate_history.CurrencyPairRateHistoryMapper.mapCurrencyPairRateHistoryToResponseDTO;
+import static com.spark.data.domain.currency_pair_rate_history.TimeWindowConverter.ONE_DAY_IN_SECONDS;
+import static com.spark.data.domain.currency_pair_rate_history.TimeWindowConverter.convertSecondsToTimeWindowFormat;
 
 @Slf4j
 @RequiredArgsConstructor
 class CurrencyPairRateHistoryService {
 
-    public static final int ONE_DAY_IN_MILLIS = 86400;
     private final CurrencyPairRateHistoryRepository currencyPairRateHistoryRepository;
     private final CurrencyPairFacade currencyPairFacade;
     private final EntityManager entityManager;
@@ -79,10 +80,11 @@ class CurrencyPairRateHistoryService {
      */
     public CurrencyPairChartRateHistoryResponse getCurrencyPairLast24hRateHistory(String symbol, String userZoneId) {
 
-        long twentyFourHoursWindowTimeMillis = Instant.now().minusSeconds(ONE_DAY_IN_MILLIS).toEpochMilli();
+        long twentyFourHoursWindowTimeMillis = Instant.now().minusSeconds(ONE_DAY_IN_SECONDS).toEpochMilli();
         List<CurrencyPairRateHistory> twentyFourHourHistoryList = currencyPairRateHistoryRepository.findBySymbolAndTimestampGreaterThanEqual(symbol, twentyFourHoursWindowTimeMillis);
         List<ChartRateHistory> chartRateHistoryList = twentyFourHourHistoryList.stream().map(e -> mapCurrencyPairRateHistoryToChartResponse(e, userZoneId)).toList();
-        return new CurrencyPairChartRateHistoryResponse(symbol,"24h", chartRateHistoryList);
+        if(chartRateHistoryList.isEmpty()) throw new CurrencyPairException(SYMBOL_IS_NOT_AVAILABLE, symbol);
+        return new CurrencyPairChartRateHistoryResponse(symbol, convertSecondsToTimeWindowFormat(ONE_DAY_IN_SECONDS), chartRateHistoryList);
 
     }
 

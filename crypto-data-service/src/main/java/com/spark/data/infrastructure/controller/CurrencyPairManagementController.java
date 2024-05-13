@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/management/currencies")
 record CurrencyPairManagementController(CurrencyPairFacade currencyPairFacade, CurrencyPairRateHistoryFacade currencyPairRateHistoryFacade) implements ManagementApi {
 
+    // TODO SECURE THIS CONTROLLER
+
     @PostMapping("/scrapper/update")
     public void updateCurrencyPairRateHistory(@RequestBody ScrappedCurrencyUpdateRequest request) {
         currencyPairRateHistoryFacade.updateCurrencyPairRateHistory(request);

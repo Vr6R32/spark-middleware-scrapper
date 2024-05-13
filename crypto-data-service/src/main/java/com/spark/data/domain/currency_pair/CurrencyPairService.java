@@ -23,18 +23,6 @@ class CurrencyPairService {
 
     private final CurrencyPairRepository currencyPairRepository;
 
-
-    /**
-     * Retrieves currency pair DTO by given symbol
-     *
-     * @return Response containing currency pair data info.
-     */
-    public CurrencyPairDTO findCurrencyPairDTOBySymbol(String symbol) {
-        CurrencyPair currencyPair = currencyPairRepository.findBySymbol(symbol)
-                .orElseThrow(() -> new CurrencyPairException(SYMBOL_IS_NOT_AVAILABLE, symbol));
-        return mapCurrencyPairToDTO(currencyPair);
-    }
-
     /**
      * Retrieves all available currency pairs.
      *
@@ -72,9 +60,9 @@ class CurrencyPairService {
      * @throws CurrencyPairException if the specified currency pair is not available.
      */
     public CurrencyPairResponse deleteCurrencyPair(CurrencyPairDeleteRequest request) {
-        CurrencyPairDTO currencyPairToDelete = findCurrencyPairDTOBySymbol(request.symbol());
-        currencyPairRepository.deleteById(currencyPairToDelete.id());
-        return new CurrencyPairResponse(DELETED_RESPONSE, currencyPairToDelete);
+        CurrencyPair currencyPairToDelete = getCurrencyPair(request.symbol());
+        currencyPairRepository.deleteById(currencyPairToDelete.getId());
+        return new CurrencyPairResponse(DELETED_RESPONSE, mapCurrencyPairToDTO(currencyPairToDelete));
     }
 
     /**
@@ -87,11 +75,17 @@ class CurrencyPairService {
      * @throws CurrencyPairException if the specified currency pair is not available.
      */
     public CurrencyPairResponse changeCurrencyPairData(CurrencyPairUpdateRequest request) {
-        CurrencyPair currencyPairToChange = currencyPairRepository.findBySymbol(request.symbol())
-                .orElseThrow(() -> new CurrencyPairException(SYMBOL_IS_NOT_AVAILABLE, request.symbol()));
+        CurrencyPair currencyPairToChange = getCurrencyPair(request.symbol());
         currencyPairToChange.setSymbol(request.symbol());
         CurrencyPair changedCurrencyPair = currencyPairRepository.save(currencyPairToChange);
         return new CurrencyPairResponse(EDITED_RESPONSE, mapCurrencyPairToDTO(changedCurrencyPair));
     }
+
+
+    private CurrencyPair getCurrencyPair(String symbol) {
+        return currencyPairRepository.findBySymbol(symbol)
+                .orElseThrow(() -> new CurrencyPairException(SYMBOL_IS_NOT_AVAILABLE, symbol));
+    }
+
 
 }

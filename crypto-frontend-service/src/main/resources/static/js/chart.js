@@ -8,18 +8,11 @@ let black_color_transparent = 'rgb(0, 0, 0, 0.4)';
 let black_color_solid = 'rgb(0, 0, 0)';
 let teal_color = 'rgb(105, 232, 192)';
 let red_color = 'rgb(255, 99, 132)';
-let gray_color = 'rgba(90,90,90,0.5)';
+let gray_color_transparent = 'rgba(90,90,90,0.5)';
 let white_color = 'rgb(255, 255, 255)';
-let chartInitialData = {
-    symbol: null,
-    timeWindow: null,
-    rateHistory: [
-        { timestamp: null, value: null }
-    ]
-};
 
 document.addEventListener('DOMContentLoaded', function() {
-    initializeUpdateChart(chartInitialData,false);
+    initializeUpdateChart(null,false);
     fetchAvailableCurrencies();
     currencySelectorListener();
     tickRateSelectorListener();
@@ -30,11 +23,10 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-
 function updateChartData(newData) {
     const newRateHistoryEntry = {
         value: newData.value,
-        timestamp: normalizeDate(newData.timestamp)
+        timestamp:newData.timestamp
     };
 
     // TODO THINK ABOUT THIS TIME COMPLEXITY , IS IT OKAY ?
@@ -74,7 +66,6 @@ function toggleDragZoom() {
         coinChart.options.plugins.zoom.pan.enabled = dragZoomDisabled;
         coinChart.options.plugins.zoom.zoom.drag.enabled = !dragZoomDisabled;
         coinChart.update();
-        // console.log(coinChart.getZoomLevel());
     }
 }
 
@@ -84,8 +75,14 @@ function initializeUpdateChart(data, resetzoom, isUpdate = false) {
 
     currentData = data;
     if (!useSingleColor) calculateColorPrediction();
-    const labels = data.rateHistory.map(entry => new Date(entry.timestamp));
-    const values = data.rateHistory.map(entry => entry.value);
+
+    let labels;
+    let values;
+
+    if(data) {
+        labels = data.rateHistory.map(entry => new Date(entry.timestamp));
+        values = data.rateHistory.map(entry => entry.value);
+    }
 
     const getBorderColor = (ctx) => {
         if (useSingleColor) {
@@ -127,7 +124,7 @@ function initializeUpdateChart(data, resetzoom, isUpdate = false) {
             data: {
                 labels: labels,
                 datasets: [{
-                    label: '(' + data.symbol + ') Price',
+                    label: '(' + selectedSymbol + ') Price',
                     data: values,
                     borderColor: getBorderColor,
                     tension: 0.1,
@@ -173,7 +170,7 @@ function initializeUpdateChart(data, resetzoom, isUpdate = false) {
                     },
                     title: {
                         display: true,
-                        text: data.timeWindow + ' Price Chart'
+                        text: '(Coin) Price Chart'
                     },
                     zoom: {
                         limits: {
@@ -191,6 +188,7 @@ function initializeUpdateChart(data, resetzoom, isUpdate = false) {
                             //     // coinChart.options.plugins.zoom.zoom.wheel.enabled = false;
                             // },
                             // onZoomComplete: function ({ chart }) {
+                            // console.log(coinChart.getZoomLevel());
                             // },
                             wheel: {
                                 mode: 'x',
@@ -229,7 +227,7 @@ function initializeUpdateChart(data, resetzoom, isUpdate = false) {
                             maxRotation: 25
                         },
                         grid: {
-                            color: gray_color
+                            color: gray_color_transparent
                         }
                     },
                     y: {
@@ -244,7 +242,7 @@ function initializeUpdateChart(data, resetzoom, isUpdate = false) {
                             }
                         },
                         grid: {
-                            color: gray_color
+                            color: gray_color_transparent
                         }
                     }
                 },

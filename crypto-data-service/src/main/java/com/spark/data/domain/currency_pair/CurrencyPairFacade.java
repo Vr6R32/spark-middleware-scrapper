@@ -1,6 +1,5 @@
 package com.spark.data.domain.currency_pair;
 
-import com.spark.models.model.CurrencyPairDTO;
 import com.spark.models.request.CurrencyPairCreateRequest;
 import com.spark.models.request.CurrencyPairDeleteRequest;
 import com.spark.models.request.CurrencyPairUpdateRequest;
@@ -14,9 +13,6 @@ public class CurrencyPairFacade {
 
     private final CurrencyPairService currencyPairService;
 
-    public CurrencyPairDTO findCurrencyPairDTOBySymbol(String symbol) {
-        return currencyPairService.findCurrencyPairDTOBySymbol(symbol);
-    }
 
     public AvailableCurrencyPairsResponse getAvailableCurrencies() {
         return currencyPairService.getAvailableCurrencies();
