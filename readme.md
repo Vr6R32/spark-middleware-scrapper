@@ -190,7 +190,7 @@ Grafana is used for metric visualization and monitoring dashboards, with Loki lo
 
 <br>
 
-<h2 align="center">Load user settings data from local storage</h2>
+<h2 align="center">Load user settings data from local storage cache</h2>
 
 <p align="center">
   <img src="readme/webp/user-settings-local-storage.webp" style="border-radius: 20px;">
@@ -281,10 +281,10 @@ docker compose up
 
 <h1 align="center">Frontend Service API:</h1>
 
-|                             GATEWAY URL                              |                  Description                  |
-|:--------------------------------------------------------------------:|:---------------------------------------------:|
-| [http://localhost:9999/chart-rest](http://localhost:9999/chart-rest) |    Data visualisation based on REST client    |
-|   [http://localhost:9999/chart-ws](http://localhost:9999/chart-ws)   | Data visualisation based on WebSocket client  |
+|                         FRONTEND SERVICE URL                         |                             GATEWAY URL                              |                  Description                  |
+|:--------------------------------------------------------------------:|:--------------------------------------------------------------------:|:---------------------------------------------:|
+| [http://localhost:4200/chart-rest](http://localhost:4200/chart-rest) | [http://localhost:9999/chart-rest](http://localhost:9999/chart-rest) |    Data visualisation based on REST client    |
+|   [http://localhost:4200/chart-ws](http://localhost:4200/chart-ws)   |   [http://localhost:9999/chart-ws](http://localhost:9999/chart-ws)   | Data visualisation based on WebSocket client  |
 
 <h1 align="center">Data Service API:</h1>
 

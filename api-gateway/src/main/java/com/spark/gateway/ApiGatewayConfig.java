@@ -1,12 +1,18 @@
 package com.spark.gateway;
 
+import org.springframework.cloud.gateway.filter.factory.DedupeResponseHeaderGatewayFilterFactory;
 import org.springframework.cloud.gateway.route.RouteLocator;
+import org.springframework.cloud.gateway.route.builder.GatewayFilterSpec;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
+import org.springframework.cloud.gateway.route.builder.UriSpec;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.reactive.socket.server.RequestUpgradeStrategy;
 import org.springframework.web.reactive.socket.server.upgrade.TomcatRequestUpgradeStrategy;
+
+import java.util.function.Function;
 
 @Configuration
 public class ApiGatewayConfig {
@@ -24,6 +30,7 @@ public class ApiGatewayConfig {
         return builder.routes()
 
                 .route("websocket-service-handshake", r -> r.path("/websocket/**")
+                        .filters(dedupeResponseHeaders())
                         .uri("lb://websocket-service"))
 
                 .route("websocket-service", r -> r.path("/ws/**")
@@ -36,6 +43,12 @@ public class ApiGatewayConfig {
                         .uri("lb://frontend-service"))
 
                 .build();
+    }
+
+    private Function<GatewayFilterSpec, UriSpec> dedupeResponseHeaders() {
+        String strategy = DedupeResponseHeaderGatewayFilterFactory.Strategy.RETAIN_FIRST.name();
+        return f -> f.dedupeResponseHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, strategy)
+                .dedupeResponseHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, strategy);
     }
 }
 
