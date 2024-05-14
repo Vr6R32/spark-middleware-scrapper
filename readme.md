@@ -54,6 +54,11 @@ WebSocket:
 Application also supports real-time data retrieval through WebSocket connections, enabling instantaneous updates and live data streaming directly from the datasource.
 
 <h1 align="left">
+Database : 
+</h1>
+The entire dataset is stored within a lightweight SQLite database, optimized with several indexes to maximize data retrieval speed.
+
+<h1 align="left">
 Time Zone Support : 
 </h1>
 Data service supports user-specified time zones, ensuring that data values are returned in the correct local time for the specified region.
@@ -111,6 +116,111 @@ Grafana is used for metric visualization and monitoring dashboards, with Loki lo
 <br>
 <br>
 
+
+
+<br>
+<h1 align="center">Chart GUI :</h1>
+<br>
+
+
+<h2 align="center">Entry Load Animation</h2>
+
+<p align="center">
+  <img src="readme/webp/chart-entry-load.webp" style="border-radius: 20px;">
+</p>
+
+<br>
+
+<h2 align="center">Real Time Chart Update
+<br>
+(offcourse works best if scrapping is set for every few sec's)
+</h2>
+
+<p align="center">
+  <img src="readme/webp/real-time-update.webp" style="border-radius: 20px;">
+</p>
+
+<br>
+
+<h2 align="center">Currency Switch Animation</h2>
+
+<p align="center">
+  <img src="readme/webp/responsive-currency-switch.webp" style="border-radius: 20px;">
+</p>
+
+<br>
+
+<h2 align="center">Bullish/Bearish Color Mode</h2>
+
+<p align="center">
+  <img src="readme/webp/bullish-bearish-color-pattern-switch.webp" style="border-radius: 20px;">
+</p>
+
+<br>
+
+<h2 align="center">Flexible Chart Mouse Movement</h2>
+
+<p align="center">
+  <img src="readme/webp/flexible-chart-mouse-movement.webp" style="border-radius: 20px;">
+</p>
+
+<br>
+
+<h2 align="center">Drag Zoom Option & Reset Zoom Button</h2>
+
+<p align="center">
+  <img src="readme/webp/dragzoom-chart-option-switch.webp" style="border-radius: 20px;">
+</p>
+
+<br>
+
+<h2 align="center">Scroll Mouse Zoom</h2>
+
+<p align="center">
+  <img src="readme/webp/scrollzoom-chart-option.webp" style="border-radius: 20px;">
+</p>
+
+<br>
+
+<h2 align="center">Chart Timescale Switch</h2>
+
+<p align="center">
+  <img src="readme/webp/flexible-chart-timescale-settings.webp" style="border-radius: 20px;">
+</p>
+
+<br>
+
+<h2 align="center">Load user settings data from local storage</h2>
+
+<p align="center">
+  <img src="readme/webp/user-settings-local-storage.webp" style="border-radius: 20px;">
+</p>
+
+<br>
+
+<h2 align="center">Services Monitoring:</h2>
+
+<p align="center">
+  <img src="readme/png/service-monitoring.png" style="border-radius: 20px;">
+</p>
+
+<br>
+
+<h2 align="center">Services Tracing & Logging:</h2>
+
+<p align="center">
+  <img src="readme/png/service-tracing-logging.png" style="border-radius: 20px;">
+</p>
+
+<br>
+
+<h2 align="center">Prometheus targets:</h2>
+
+<p align="center">
+  <img src="readme/png/prometheus-targets.png" style="border-radius: 20px;">
+</p>
+
+<br>
 
 
 
@@ -202,84 +312,3 @@ docker compose up
 |        |                                                                                                                         |                                                      |                   |                      |                                     |                              |                                                      |
 |  POST  |                       [http://localhost:9002/api/v1/events](http://localhost:9002/api/v1/events)                        | Internal method for scrapper service to update data  |         x         |          x           | ScrappedCurrencyUpdateRequest.Class |
 
-
-
-<br>
-<h1 align="center">Chart GUI :</h1>
-<br>
-
-
-<h2 align="center">Entry Load Animation</h2>
-
-<p align="center">
-  <img src="readme/webp/chart-entry-load.webp" style="border-radius: 20px;">
-</p>
-
-<br>
-
-<h2 align="center">Real Time Chart Update
-<br>
-(offcourse works best if scrapping is set for every few sec's)
-</h2>
-
-<p align="center">
-  <img src="readme/webp/real-time-update.webp" style="border-radius: 20px;">
-</p>
-
-<br>
-
-<h2 align="center">Currency Switch Animation</h2>
-
-<p align="center">
-  <img src="readme/webp/responsive-currency-switch.webp" style="border-radius: 20px;">
-</p>
-
-<br>
-
-<h2 align="center">Bullish/Bearish Color Mode</h2>
-
-<p align="center">
-  <img src="readme/webp/bullish-bearish-color-pattern-switch.webp" style="border-radius: 20px;">
-</p>
-
-<br>
-
-<h2 align="center">Flexible Chart Mouse Movement</h2>
-
-<p align="center">
-  <img src="readme/webp/flexible-chart-mouse-movement.webp" style="border-radius: 20px;">
-</p>
-
-<br>
-
-<h2 align="center">Drag Zoom Option & Reset Zoom Button</h2>
-
-<p align="center">
-  <img src="readme/webp/dragzoom-chart-option-switch.webp" style="border-radius: 20px;">
-</p>
-
-<br>
-
-<h2 align="center">Scroll Mouse Zoom</h2>
-
-<p align="center">
-  <img src="readme/webp/scrollzoom-chart-option.webp" style="border-radius: 20px;">
-</p>
-
-<br>
-
-<h2 align="center">Chart Timescale Switch</h2>
-
-<p align="center">
-  <img src="readme/webp/flexible-chart-timescale-settings.webp" style="border-radius: 20px;">
-</p>
-
-<br>
-
-<h2 align="center">Load user settings data from local storage</h2>
-
-<p align="center">
-  <img src="readme/webp/user-settings-local-storage.webp" style="border-radius: 20px;">
-</p>
-
-<br>

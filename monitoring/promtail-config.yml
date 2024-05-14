@@ -20,7 +20,7 @@ scrape_configs:
     static_configs:
       - targets: ['localhost']
         labels:
-          job: 'auth-service'
+          job: 'data-service'
           __path__: '/var/log/spring/data-service.*.log'
 
   - job_name: 'websocket-service'

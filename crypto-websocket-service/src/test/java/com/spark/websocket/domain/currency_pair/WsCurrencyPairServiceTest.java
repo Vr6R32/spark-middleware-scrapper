@@ -29,6 +29,9 @@ class WsCurrencyPairServiceTest {
     public static final String WS_SESSION_URL_PATH = "/ws/session/";
     public static final String USER_TIME_ZONE = "Europe/Warsaw";
     public static final ZonedDateTime TIMESTAMP = ZonedDateTime.parse("2024-05-12T16:42:36.545+02:00");
+    public static final String BTCUSDT = "BTCUSDT";
+    public static final String ETHUSDT = "ETHUSDT";
+    public static final String LTCUSDT = "LTCUSDT";
 
     @Mock
     private CryptoDataServiceClient cryptoDataServiceClient;
@@ -55,9 +58,9 @@ class WsCurrencyPairServiceTest {
     void shouldFetchAndSendAvailableCurrenciesEventToSession() {
 
         // Given
-        CurrencyPairDTO btcusdt = CurrencyPairDTO.builder().id(1L).symbol("BTCUSDT").build();
-        CurrencyPairDTO ethusdt = CurrencyPairDTO.builder().id(2L).symbol("ETHUSDT").build();
-        CurrencyPairDTO ltcusdt = CurrencyPairDTO.builder().id(3L).symbol("LTCUSDT").build();
+        CurrencyPairDTO btcusdt = CurrencyPairDTO.builder().id(1L).symbol(BTCUSDT).build();
+        CurrencyPairDTO ethusdt = CurrencyPairDTO.builder().id(2L).symbol(ETHUSDT).build();
+        CurrencyPairDTO ltcusdt = CurrencyPairDTO.builder().id(3L).symbol(LTCUSDT).build();
         Set<CurrencyPairDTO> currencyPairDTOSet = Set.of(btcusdt, ethusdt, ltcusdt);
 
         AvailableCurrencyPairsResponse response = new AvailableCurrencyPairsResponse(currencyPairDTOSet);
@@ -85,20 +88,19 @@ class WsCurrencyPairServiceTest {
     @Test
     void shouldFetchAndSendLatestCurrencyPairRateEventToSession() {
         // Given
-        String symbol = "BTCUSDT";
         BigDecimal btcValue = BigDecimal.valueOf(60314.241);
 
-        CurrencyPairSingleRateHistoryResponse dataClientMockedResponse = new CurrencyPairSingleRateHistoryResponse(symbol,btcValue, TIMESTAMP);
+        CurrencyPairSingleRateHistoryResponse dataClientMockedResponse = new CurrencyPairSingleRateHistoryResponse(BTCUSDT,btcValue, TIMESTAMP);
 
         WebSocketEventMessageResponse expectedResponse = new WebSocketEventMessageResponse(LATEST_CURRENCY_PAIR_RATE,dataClientMockedResponse);
 
-        when(cryptoDataServiceClient.getLatestCurrencyPairRate(symbol, USER_TIME_ZONE)).thenReturn(dataClientMockedResponse);
+        when(cryptoDataServiceClient.getLatestCurrencyPairRate(BTCUSDT, USER_TIME_ZONE)).thenReturn(dataClientMockedResponse);
 
         // When
-        wsCurrencyPairService.fetchAndSendLatestCurrencyPairRateToSession(symbol, SESSION_ID, USER_TIME_ZONE);
+        wsCurrencyPairService.fetchAndSendLatestCurrencyPairRateToSession(BTCUSDT, SESSION_ID, USER_TIME_ZONE);
 
         // Then
-        verify(cryptoDataServiceClient).getLatestCurrencyPairRate(symbol, USER_TIME_ZONE);
+        verify(cryptoDataServiceClient).getLatestCurrencyPairRate(BTCUSDT, USER_TIME_ZONE);
         verify(messagingTemplate).convertAndSend(eq(WS_SESSION_URL_PATH + SESSION_ID), argumentCaptor.capture());
 
         WebSocketEventMessageResponse capturedResponse = argumentCaptor.getValue();
@@ -111,21 +113,20 @@ class WsCurrencyPairServiceTest {
     @Test
     void shouldFetchAndSendCurrencyPairLast24hRateHistoryEventToSession() {
         // Given
-        String symbol = "ETHUSD";
         String windowTime = "24H";
 
-        CurrencyPairChartRateHistoryResponse dataClientMockedResponse = new CurrencyPairChartRateHistoryResponse(symbol,windowTime,List.of(new ChartRateHistory(BigDecimal.valueOf(3021.2314),TIMESTAMP)));
+        CurrencyPairChartRateHistoryResponse dataClientMockedResponse = new CurrencyPairChartRateHistoryResponse(ETHUSDT,windowTime,List.of(new ChartRateHistory(BigDecimal.valueOf(3021.2314),TIMESTAMP)));
 
         WebSocketEventMessageResponse expectedResponse = new WebSocketEventMessageResponse(LAST_24H_CURRENCY_PAIR_RATE_HISTORY,dataClientMockedResponse);
 
-        when(cryptoDataServiceClient.getCurrencyPairLast24hRateHistory(symbol, USER_TIME_ZONE)).thenReturn(dataClientMockedResponse);
+        when(cryptoDataServiceClient.getCurrencyPairLast24hRateHistory(ETHUSDT, USER_TIME_ZONE)).thenReturn(dataClientMockedResponse);
 
         // When
-        wsCurrencyPairService.fetchAndSendCurrencyPairLast24hRateHistoryToSession(symbol, SESSION_ID, USER_TIME_ZONE);
+        wsCurrencyPairService.fetchAndSendCurrencyPairLast24hRateHistoryToSession(ETHUSDT, SESSION_ID, USER_TIME_ZONE);
 
         // Then
-        verify(cryptoDataServiceClient).getCurrencyPairLast24hRateHistory(symbol, USER_TIME_ZONE);
-        verify(sessionManager).setSessionAttribute(SESSION_ID, "selectedSymbol", symbol);
+        verify(cryptoDataServiceClient).getCurrencyPairLast24hRateHistory(ETHUSDT, USER_TIME_ZONE);
+        verify(sessionManager).setSessionAttribute(SESSION_ID, "selectedSymbol", ETHUSDT);
         verify(messagingTemplate).convertAndSend(eq(WS_SESSION_URL_PATH + SESSION_ID), argumentCaptor.capture());
 
         WebSocketEventMessageResponse capturedResponse = argumentCaptor.getValue();
@@ -139,7 +140,7 @@ class WsCurrencyPairServiceTest {
     @Test
     void shouldFetchAndSendAvailableCurrencyPairsLatestCurrencyRateEventToSession() {
         // Given
-        List<CurrencyPairSingleRateHistoryResponse> dataClientMockedResponse = List.of(new CurrencyPairSingleRateHistoryResponse("BTCUSDT", BigDecimal.valueOf(60231.2352), TIMESTAMP));
+        List<CurrencyPairSingleRateHistoryResponse> dataClientMockedResponse = List.of(new CurrencyPairSingleRateHistoryResponse(BTCUSDT, BigDecimal.valueOf(60231.2352), TIMESTAMP));
         when(cryptoDataServiceClient.getAvailableCurrencyPairsLatestCurrencyRate(USER_TIME_ZONE)).thenReturn(dataClientMockedResponse);
 
         WebSocketEventMessageResponse expectedResponse = new WebSocketEventMessageResponse(AVAILABLE_CURRENCIES_LATEST_RATE_HISTORY,dataClientMockedResponse);
