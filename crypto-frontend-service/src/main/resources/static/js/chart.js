@@ -2,7 +2,7 @@ let coinChart;
 let currentData;
 let selectedSymbol;
 let currentChartColor;
-let useSingleColor = true;
+let useSingleColor;
 let dragZoomDisabled = true;
 let black_color_transparent = 'rgb(0, 0, 0, 0.4)';
 let black_color_solid = 'rgb(0, 0, 0)';
@@ -12,15 +12,9 @@ let gray_color_transparent = 'rgba(90,90,90,0.5)';
 let white_color = 'rgb(255, 255, 255)';
 
 document.addEventListener('DOMContentLoaded', function() {
+    initializeUserSettings();
     initializeUpdateChart(null,false);
-    fetchAvailableCurrencies();
-    currencySelectorListener();
-    chartTimeScaleSelectorListener();
-    currencyTimeWindowSelectorListener();
-    resetZoomListener();
-    windowResizeListener();
-    colorButtonListener();
-    dragZoomListener();
+    activateListeners();
 });
 
 
@@ -67,6 +61,7 @@ function toggleDragZoom() {
         coinChart.options.plugins.zoom.pan.enabled = dragZoomDisabled;
         coinChart.options.plugins.zoom.zoom.drag.enabled = !dragZoomDisabled;
         coinChart.update();
+        saveUserSettingToLocalStorage('drag-zoom-disable', dragZoomDisabled);
     }
 }
 

@@ -1,9 +1,22 @@
+
+function activateListeners() {
+    currencySelectorListener();
+    chartTimeScaleSelectorListener();
+    currencyTimeWindowSelectorListener();
+    resetZoomListener();
+    windowResizeListener();
+    colorButtonListener();
+    dragZoomListener();
+}
+
+
 function colorButtonListener() {
     let colorModeButton = document.getElementById('color-mode');
     colorModeButton.addEventListener('click', function () {
         useSingleColor = !useSingleColor;
         this.classList.toggle('active');
-        initializeUpdateChart(currentData,false);
+        saveUserSettingToLocalStorage('use-single-color', useSingleColor);
+        initializeUpdateChart(currentData, false);
     });
 }
 
@@ -33,6 +46,7 @@ function chartTimeScaleSelectorListener() {
     });
 
     chartTimeScaleSelectorListener.addEventListener('change', function() {
+        saveUserSettingToLocalStorage('chart-time-scale', this.value);
         updateChartTimeScaleUnit(this.value);
     });
 }
@@ -63,11 +77,10 @@ function currencyTimeWindowSelectorListener() {
     });
 
     currencyTimeWindowSelectorListener.addEventListener('change', function() {
-        fetchCoinRateHistory(selectedSymbol);
+        // fetchCoinRateHistory(selectedSymbol);
     });
 
 }
-
 
 
 function resetZoomListener() {
@@ -82,6 +95,7 @@ function currencySelectorListener() {
     let currencySelector = document.getElementById('currency-selector');
     currencySelector.addEventListener('change', function () {
         selectedSymbol = this.value;
+        saveUserSettingToLocalStorage('selected-symbol', selectedSymbol);
         fetchCoinRateHistory(selectedSymbol);
     });
 }
@@ -98,4 +112,17 @@ function windowResizeListener() {
 function dragZoomListener() {
     let dragZoom = document.getElementById('drag-zoom');
     dragZoom.addEventListener('click', toggleDragZoom);
+}
+
+function currencySelectorHandle(payload) {
+    const currencySelector = document.getElementById('currency-selector');
+    payload.currencies.forEach(currency => {
+        const option = document.createElement('option');
+        option.value = currency.symbol;
+        option.text = currency.symbol;
+        currencySelector.appendChild(option);
+        if (selectedSymbol !== null && option.value === selectedSymbol) option.selected = true;
+    });
+    if (selectedSymbol === null) selectedSymbol = currencySelector.value;
+    fetchCoinRateHistory(selectedSymbol);
 }

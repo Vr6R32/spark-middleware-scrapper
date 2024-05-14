@@ -171,36 +171,36 @@ docker compose up
 
 <h1 align="center">Frontend Service API:</h1>
 
-|                             SERVICE URL                              |                             GATEWAY URL                              |                  Description                  |
-|:--------------------------------------------------------------------:|:--------------------------------------------------------------------:|:---------------------------------------------:|
-| [http://localhost:4200/chart-rest](http://localhost:4200/chart-rest) | [http://localhost:9999/chart-rest](http://localhost:9999/chart-rest) |    Data visualisation based on REST client    |
-|   [http://localhost:4200/chart-ws](http://localhost:4200/chart-ws)   |   [http://localhost:9999/chart-ws](http://localhost:9999/chart-ws)   | Data visualisation based on WebSocket client  |
+|                             GATEWAY URL                              |                  Description                  |
+|:--------------------------------------------------------------------:|:---------------------------------------------:|
+| [http://localhost:9999/chart-rest](http://localhost:9999/chart-rest) |    Data visualisation based on REST client    |
+|   [http://localhost:9999/chart-ws](http://localhost:9999/chart-ws)   | Data visualisation based on WebSocket client  |
 
 <h1 align="center">Data Service API:</h1>
 
-| METHOD |                                                         URL                                                         |   REQUEST PARAMS    |  PATH VARIABLE  |            REQUEST BODY             |                     Description                      |
-|:------:|:-------------------------------------------------------------------------------------------------------------------:|:-------------------:|:---------------:|:-----------------------------------:|:----------------------------------------------------:|
-|  GET   |                            [/api/v1/currencies](http://localhost:9001/api/v1/currencies)                            | String {userZoneId} |        x        |                  x                  |         Returns all available currency pairs         |
-|  GET   |           [/api/v1/currencies/lastDay/{symbol}](http://localhost:9001/api/v1/currencies/lastDay/BTCUSDT)            | String {userZoneId} | String {symbol} |                  x                  | Returns last 24h chart history of specified currency |
-|  GET   |                    [/api/v1/currencies/lastAll](http://localhost:9001/api/v1/currencies/lastAll)                    | String {userZoneId} |        x        |                  x                  |  Returns all available currency pairs latest values  |
-|  GET   |              [/api/v1/currencies/last/{symbol}](http://localhost:9001/api/v1/currencies/last/BTCUSDT)               | String {userZoneId} | String {symbol} |                  x                  |        Returns last specified currency value         |
-|        |                                                                                                                     |                     |                 |                                     |                                                      |
-|  PUT   |                 [/api/v1/management/currencies](http://localhost:9001/api/v1/management/currencies)                 |          x          |        x        |   CurrencyPairUpdateRequest.Class   |   Updates currency pair data based on request data   |
-|  POST  |                 [/api/v1/management/currencies](http://localhost:9001/api/v1/management/currencies)                 |          x          |        x        |   CurrencyPairCreateRequest.Class   |   Creates currency pair data based on request data   |
-| DELETE |                 [/api/v1/management/currencies](http://localhost:9001/api/v1/management/currencies)                 |          x          |        x        |   CurrencyPairDeleteRequest.Class   |   Deletes currency pair data based on request data   |
-|  POST  | [/api/v1/management/currencies/scrapper/update](http://localhost:9001/api/v1/management/currencies/scrapper/update) |          x          |        x        | ScrappedCurrencyUpdateRequest.Class | Internal method for scrapper service to update data  |
+| METHOD |                                                         URL                                                         |                     Description                      |   REQUEST PARAMS    |  PATH VARIABLE  |            REQUEST BODY             |
+|:------:|:-------------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------:|:-------------------:|:---------------:|:-----------------------------------:|
+|  GET   |                            [/api/v1/currencies](http://localhost:9001/api/v1/currencies)                            |         Returns all available currency pairs         | String {userZoneId} |        x        |                  x                  |
+|  GET   |           [/api/v1/currencies/lastDay/{symbol}](http://localhost:9001/api/v1/currencies/lastDay/BTCUSDT)            | Returns last 24h chart history of specified currency | String {userZoneId} | String {symbol} |                  x                  |
+|  GET   |                    [/api/v1/currencies/lastAll](http://localhost:9001/api/v1/currencies/lastAll)                    |  Returns all available currency pairs latest values  | String {userZoneId} |        x        |                  x                  |
+|  GET   |              [/api/v1/currencies/last/{symbol}](http://localhost:9001/api/v1/currencies/last/BTCUSDT)               |        Returns last specified currency value         | String {userZoneId} | String {symbol} |                  x                  |
+|        |                                                                                                                     |                                                      |                     |                 |                                     |
+|  PUT   |                 [/api/v1/management/currencies](http://localhost:9001/api/v1/management/currencies)                 |   Updates currency pair data based on request data   |          x          |        x        |   CurrencyPairUpdateRequest.Class   |
+|  POST  |                 [/api/v1/management/currencies](http://localhost:9001/api/v1/management/currencies)                 |   Creates currency pair data based on request data   |          x          |        x        |   CurrencyPairCreateRequest.Class   |
+| DELETE |                 [/api/v1/management/currencies](http://localhost:9001/api/v1/management/currencies)                 |   Deletes currency pair data based on request data   |          x          |        x        |   CurrencyPairDeleteRequest.Class   |
+|  POST  | [/api/v1/management/currencies/scrapper/update](http://localhost:9001/api/v1/management/currencies/scrapper/update) | Internal method for scrapper service to update data  |          x          |        x        | ScrappedCurrencyUpdateRequest.Class |
 
 <h1 align="center">WebSocket Service API:</h1>
 
-| METHOD |                                                           URL                                                           |  REQUEST PARAMS   | DESTINATION VARIABLE |            REQUEST BODY             |                     Description                      |
-|:------:|:-----------------------------------------------------------------------------------------------------------------------:|:-----------------:|:--------------------:|:-----------------------------------:|:----------------------------------------------------:|
-|   x    | [http://localhost:9002/websocket/info?timezone={timeZone}](http://localhost:9002/websocket/info?timezone=Europe/Warsaw) | String {timezone} |          x           |                  x                  |                  HandShake endpoint                  |
-|   x    |                    [ws://localhost:9002/ws/api/v1/currencies](ws://localhost:9002/api/v1/currencies)                    |         x         |          x           |                  x                  |         Returns all available currency pairs         |
-|   x    |   [ws://localhost:9002/ws/api/v1/currencies/lastDay/{symbol}](ws://localhost:9002/api/v1/currencies/lastDay/BTCUSDT)    |         x         |   String {symbol}    |                  x                  | Returns last 24h chart history of specified currency |
-|   x    |         [ws://localhost:9002/ws/api/v1/currencies/last/lastAll](ws://localhost:9002/api/v1/currencies/lastAll)          |         x         |          x           |                  x                  |  Returns all available currency pairs latest values  |
-|   x    |     [ws://localhost:9002/ws/api/v1/currencies/last/{symbol}](ws://localhost:9002/ws/api/v1/currencies/last/BTCUSDT)     |         x         |   String {symbol}    |                  x                  |        Returns last specified currency value         |
-|        |                                                                                                                         |                   |                      |                                     |                                                      |                                     |                                                      |
-|  POST  |                       [http://localhost:9002/api/v1/events](http://localhost:9002/api/v1/events)                        |         x         |          x           | ScrappedCurrencyUpdateRequest.Class | Internal method for scrapper service to update data  |
+| METHOD |                                                           URL                                                           |                     Description                      |  REQUEST PARAMS   | DESTINATION VARIABLE |            REQUEST BODY             |
+|:------:|:-----------------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------:|:-----------------:|:--------------------:|:-----------------------------------:|
+|   x    | [http://localhost:9002/websocket/info?timezone={timeZone}](http://localhost:9002/websocket/info?timezone=Europe/Warsaw) |                  HandShake endpoint                  | String {timezone} |          x           |                  x                  |
+|   x    |                    [ws://localhost:9002/ws/api/v1/currencies](ws://localhost:9002/api/v1/currencies)                    |         Returns all available currency pairs         |         x         |          x           |                  x                  |
+|   x    |   [ws://localhost:9002/ws/api/v1/currencies/lastDay/{symbol}](ws://localhost:9002/api/v1/currencies/lastDay/BTCUSDT)    | Returns last 24h chart history of specified currency |         x         |   String {symbol}    |                  x                  |
+|   x    |         [ws://localhost:9002/ws/api/v1/currencies/last/lastAll](ws://localhost:9002/api/v1/currencies/lastAll)          |  Returns all available currency pairs latest values  |         x         |          x           |                  x                  |
+|   x    |     [ws://localhost:9002/ws/api/v1/currencies/last/{symbol}](ws://localhost:9002/ws/api/v1/currencies/last/BTCUSDT)     |        Returns last specified currency value         |         x         |   String {symbol}    |                  x                  |
+|        |                                                                                                                         |                                                      |                   |                      |                                     |                              |                                                      |
+|  POST  |                       [http://localhost:9002/api/v1/events](http://localhost:9002/api/v1/events)                        | Internal method for scrapper service to update data  |         x         |          x           | ScrappedCurrencyUpdateRequest.Class |
 
 
 
@@ -217,7 +217,10 @@ docker compose up
 
 <br>
 
-<h2 align="center">Real Time Chart Update (offcourse works best if scrapping is for every few sec's)</h2>
+<h2 align="center">Real Time Chart Update
+<br>
+(offcourse works best if scrapping is set for every few sec's)
+</h2>
 
 <p align="center">
   <img src="readme/webp/real-time-update.webp" style="border-radius: 20px;">
@@ -249,7 +252,7 @@ docker compose up
 
 <br>
 
-<h2 align="center">Drag Zoom Option</h2>
+<h2 align="center">Drag Zoom Option & Reset Zoom Button</h2>
 
 <p align="center">
   <img src="readme/webp/dragzoom-chart-option-switch.webp" style="border-radius: 20px;">
@@ -269,6 +272,14 @@ docker compose up
 
 <p align="center">
   <img src="readme/webp/flexible-chart-timescale-settings.webp" style="border-radius: 20px;">
+</p>
+
+<br>
+
+<h2 align="center">Load user settings data from local storage</h2>
+
+<p align="center">
+  <img src="readme/webp/user-settings-local-storage.webp" style="border-radius: 20px;">
 </p>
 
 <br>

@@ -21,15 +21,7 @@ function handleIncomingEvent(event) {
 }
 
 function handleAvailableCurrenciesData(payload) {
-    const currencySelector = document.getElementById('currency-selector');
-    payload.currencies.forEach(currency => {
-        const option = document.createElement('option');
-        option.value = currency.symbol;
-        option.text = currency.symbol;
-        currencySelector.appendChild(option);
-    });
-    selectedSymbol = currencySelector.value;
-    fetchCoinRateHistory(selectedSymbol);
+    currencySelectorHandle(payload);
 }
 
 function handleLast24hCurrencyPairRateHistory(payload) {

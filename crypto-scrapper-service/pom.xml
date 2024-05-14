@@ -65,6 +65,8 @@
 
         <!--@@@@@@@@@@@@@@@@@@@@@@@@@ OBJECT SERIALIZATION  @@@@@@@@@@@@@@@@@@@@@@@@@@-->
 
+        <!-- @@ WARNING @@   BUMPING UP VERSION OF THESE TWO LIBRARIES THREATENS TO DEPENDENCIES CONFLICT       -->
+
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
