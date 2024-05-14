@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="readme/chart-overview.png" style="border-radius: 20px;">
+  <img src="readme/png/chart-overview.png" style="border-radius: 20px;">
 </p>
 <br>
 
@@ -137,7 +137,7 @@ docker compose up
 <h2 align="center">& run all spring services</h2>
 
 <p align="center">
-  <img src="readme/local-environment-run.png" style="border-radius: 10px;">
+  <img src="readme/png/local-environment-run.png" style="border-radius: 10px;">
 </p>
 
 <br>
@@ -196,8 +196,79 @@ docker compose up
 |:------:|:-----------------------------------------------------------------------------------------------------------------------:|:-----------------:|:--------------------:|:-----------------------------------:|:----------------------------------------------------:|
 |   x    | [http://localhost:9002/websocket/info?timezone={timeZone}](http://localhost:9002/websocket/info?timezone=Europe/Warsaw) | String {timezone} |          x           |                  x                  |                  HandShake endpoint                  |
 |   x    |                    [ws://localhost:9002/ws/api/v1/currencies](ws://localhost:9002/api/v1/currencies)                    |         x         |          x           |                  x                  |         Returns all available currency pairs         |
-|   x    |  [ws://localhost:9002/ws/api/v1/currencies/lastDay/{symbol}](http://localhost:9002/api/v1/currencies/lastDay/BTCUSDT)   |         x         |   String {symbol}    |                  x                  | Returns last 24h chart history of specified currency |
-|   x    |        [ws://localhost:9002/ws/api/v1/currencies/last/lastAll](http://localhost:9002/api/v1/currencies/lastAll)         |         x         |          x           |                  x                  |  Returns all available currency pairs latest values  |
+|   x    |   [ws://localhost:9002/ws/api/v1/currencies/lastDay/{symbol}](ws://localhost:9002/api/v1/currencies/lastDay/BTCUSDT)    |         x         |   String {symbol}    |                  x                  | Returns last 24h chart history of specified currency |
+|   x    |         [ws://localhost:9002/ws/api/v1/currencies/last/lastAll](ws://localhost:9002/api/v1/currencies/lastAll)          |         x         |          x           |                  x                  |  Returns all available currency pairs latest values  |
 |   x    |     [ws://localhost:9002/ws/api/v1/currencies/last/{symbol}](ws://localhost:9002/ws/api/v1/currencies/last/BTCUSDT)     |         x         |   String {symbol}    |                  x                  |        Returns last specified currency value         |
 |        |                                                                                                                         |                   |                      |                                     |                                                      |                                     |                                                      |
-|  PUT   |                       [http://localhost:9002/api/v1/events](http://localhost:9002/api/v1/events)                        |         x         |          x           | ScrappedCurrencyUpdateRequest.Class | Internal method for scrapper service to update data  |
+|  POST  |                       [http://localhost:9002/api/v1/events](http://localhost:9002/api/v1/events)                        |         x         |          x           | ScrappedCurrencyUpdateRequest.Class | Internal method for scrapper service to update data  |
+
+
+
+<br>
+<h1 align="center">Chart GUI :</h1>
+<br>
+
+
+<h2 align="center">Entry Load Animation</h2>
+
+<p align="center">
+  <img src="readme/webp/chart-entry-load.webp" style="border-radius: 20px;">
+</p>
+
+<br>
+
+<h2 align="center">Real Time Chart Update (offcourse works best if scrapping is for every few sec's)</h2>
+
+<p align="center">
+  <img src="readme/webp/real-time-update.webp" style="border-radius: 20px;">
+</p>
+
+<br>
+
+<h2 align="center">Currency Switch Animation</h2>
+
+<p align="center">
+  <img src="readme/webp/responsive-currency-switch.webp" style="border-radius: 20px;">
+</p>
+
+<br>
+
+<h2 align="center">Bullish/Bearish Color Mode</h2>
+
+<p align="center">
+  <img src="readme/webp/bullish-bearish-color-pattern-switch.webp" style="border-radius: 20px;">
+</p>
+
+<br>
+
+<h2 align="center">Flexible Chart Mouse Movement</h2>
+
+<p align="center">
+  <img src="readme/webp/flexible-chart-mouse-movement.webp" style="border-radius: 20px;">
+</p>
+
+<br>
+
+<h2 align="center">Drag Zoom Option</h2>
+
+<p align="center">
+  <img src="readme/webp/dragzoom-chart-option-switch.webp" style="border-radius: 20px;">
+</p>
+
+<br>
+
+<h2 align="center">Scroll Mouse Zoom</h2>
+
+<p align="center">
+  <img src="readme/webp/scrollzoom-chart-option.webp" style="border-radius: 20px;">
+</p>
+
+<br>
+
+<h2 align="center">Chart Timescale Switch</h2>
+
+<p align="center">
+  <img src="readme/webp/flexible-chart-timescale-settings.webp" style="border-radius: 20px;">
+</p>
+
+<br>
