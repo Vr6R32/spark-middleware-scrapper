@@ -69,15 +69,13 @@ body {
     white-space: nowrap;
 }
 
-
-#currency-selector:hover {
+#currency-selector, #chart-time-scale-selector, #currency-time-window-selector:hover {
     cursor: pointer;
 }
 
-#currency-selector option {
-    padding: 15px;
+#currency-selector, #chart-time-scale-selector, #currency-time-window-selector option {
     color: #fff;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.5);
 }
 
 #reset-zoom:hover {
@@ -92,15 +90,11 @@ body {
 
 #color-mode.active {
     color: rgba(255, 0, 0, 0.8);
-    /*box-shadow: rgba(255, 0, 0, 0.3) 0 19px 38px, rgba(255, 0, 0, 0.22) 0 15px 12px;*/
 }
 
 #color-mode.active:hover {
-    /*color: rgba(255, 0, 0, 0.8);*/
-    /*box-shadow: rgba(255, 255, 255, 0.3) 0 19px 38px, rgba(255, 255, 255, 0.22) 0 15px 12px;*/
     box-shadow: rgba(255, 0, 0, 0.3) 0 19px 38px, rgba(255, 0, 0, 0.22) 0 15px 12px;
 }
-
 
 #drag-zoom:hover {
     box-shadow: rgba(70, 255, 228, 0.3) 0 19px 38px, rgba(70, 255, 228, 0.22) 0 15px 12px;
@@ -109,11 +103,8 @@ body {
 
 #drag-zoom.active {
     color: rgba(70, 255, 228, 0.8);
-    /*box-shadow: rgba(70, 255, 228, 0.3) 0 19px 38px, rgba(70, 255, 228, 0.22) 0 15px 12px;*/
 }
 
 #drag-zoom.active:hover {
-    /*color: rgba(70, 255, 228, 0.8);*/
-    /*box-shadow: rgba(255, 255, 255, 0.3) 0 19px 38px, rgba(255, 255, 255, 0.22) 0 15px 12px;*/
     box-shadow: rgba(70, 255, 228, 0.3) 0 19px 38px, rgba(70, 255, 228, 0.22) 0 15px 12px;
 }
