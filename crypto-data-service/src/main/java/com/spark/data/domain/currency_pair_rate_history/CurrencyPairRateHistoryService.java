@@ -19,8 +19,7 @@ import java.util.Set;
 import static com.spark.data.domain.currency_pair.CurrencyPairException.SYMBOL_IS_NOT_AVAILABLE;
 import static com.spark.data.domain.currency_pair_rate_history.CurrencyPairRateHistoryMapper.mapCurrencyPairRateHistoryToChartResponse;
 import static com.spark.data.domain.currency_pair_rate_history.CurrencyPairRateHistoryMapper.mapCurrencyPairRateHistoryToResponseDTO;
-import static com.spark.data.domain.currency_pair_rate_history.TimeWindowConverter.ONE_DAY_IN_SECONDS;
-import static com.spark.data.domain.currency_pair_rate_history.TimeWindowConverter.convertSecondsToTimeWindowFormat;
+import static com.spark.data.domain.currency_pair_rate_history.TimeWindowConverter.*;
 
 @Slf4j
 @RequiredArgsConstructor

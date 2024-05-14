@@ -39,13 +39,15 @@ function chartTimeScaleSelectorListener() {
 
 function currencyTimeWindowSelectorListener() {
 
+    //TODO HANDLE DIFFERENT TIME WINDOW CASES
+
     const timeWindowUnits = [
-        '1hour',
-        '24h',
-        'week',
-        'month',
-        'quarter',
-        'year'
+        // '1hour',
+        '24h'
+        // 'week',
+        // 'month',
+        // 'quarter',
+        // 'year'
     ];
 
     const currencyTimeWindowSelectorListener = document.getElementById('currency-time-window-selector');
