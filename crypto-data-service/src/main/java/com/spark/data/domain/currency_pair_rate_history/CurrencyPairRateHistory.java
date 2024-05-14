@@ -4,13 +4,19 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Data
 @Entity
+@Builder
 @Table(name = "currency_pair_rate_history")
+@AllArgsConstructor
+@RequiredArgsConstructor
 class CurrencyPairRateHistory {
 
     @Id

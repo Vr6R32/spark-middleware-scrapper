@@ -82,7 +82,7 @@ class CurrencyPairService {
     }
 
 
-    private CurrencyPair getCurrencyPair(String symbol) {
+    CurrencyPair getCurrencyPair(String symbol) {
         return currencyPairRepository.findBySymbol(symbol)
                 .orElseThrow(() -> new CurrencyPairException(SYMBOL_IS_NOT_AVAILABLE, symbol));
     }

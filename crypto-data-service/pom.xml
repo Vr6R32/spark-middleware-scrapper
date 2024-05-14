@@ -26,6 +26,8 @@
         <openapi-ui-starter.version>2.1.0</openapi-ui-starter.version>
         <spring-security-core.version>6.1.9</spring-security-core.version>
         <spring-security-web.version>6.2.4</spring-security-web.version>
+        <assertj-core.version>3.23.1</assertj-core.version>
+        <mockito-core.version>4.9.0</mockito-core.version>
     </properties>
 
     <dependencies>
@@ -117,10 +119,51 @@
             <version>${spring-security-core.version}</version>
         </dependency>
 
+
+        <!--@@@@@@@@@@@@@@@@@@@@@@@@@ TEST DEPENDENCIES @@@@@@@@@@@@@@@@@@@@@@@@@@-->
+
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+            <version>2.9.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj-core.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito-core.version}</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M7</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.junit.jupiter</groupId>
+                        <artifactId>junit-jupiter-engine</artifactId>
+                        <version>5.10.2</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>

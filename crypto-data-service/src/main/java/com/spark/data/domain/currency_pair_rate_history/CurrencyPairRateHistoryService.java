@@ -81,8 +81,8 @@ class CurrencyPairRateHistoryService {
 
         long twentyFourHoursWindowTimeMillis = Instant.now().minusSeconds(ONE_DAY_IN_SECONDS).toEpochMilli();
         List<CurrencyPairRateHistory> twentyFourHourHistoryList = currencyPairRateHistoryRepository.findBySymbolAndTimestampGreaterThanEqual(symbol, twentyFourHoursWindowTimeMillis);
+        if(twentyFourHourHistoryList.isEmpty()) throw new CurrencyPairException(SYMBOL_IS_NOT_AVAILABLE, symbol);
         List<ChartRateHistory> chartRateHistoryList = twentyFourHourHistoryList.stream().map(e -> mapCurrencyPairRateHistoryToChartResponse(e, userZoneId)).toList();
-        if(chartRateHistoryList.isEmpty()) throw new CurrencyPairException(SYMBOL_IS_NOT_AVAILABLE, symbol);
         return new CurrencyPairChartRateHistoryResponse(symbol, convertSecondsToTimeWindowFormat(ONE_DAY_IN_SECONDS), chartRateHistoryList);
 
     }
