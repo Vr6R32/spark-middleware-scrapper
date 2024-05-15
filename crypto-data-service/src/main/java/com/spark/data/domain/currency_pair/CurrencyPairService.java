@@ -49,6 +49,7 @@ class CurrencyPairService {
         });
         CurrencyPair newCurrencyPair = CurrencyPair.builder().symbol(request.symbol()).build();
         currencyPairRepository.save(newCurrencyPair);
+        log.info("[{}] : [{}]", CREATED_RESPONSE, request.symbol());
         return new CurrencyPairResponse(CREATED_RESPONSE, mapCurrencyPairToDTO(newCurrencyPair));
     }
 
@@ -62,6 +63,7 @@ class CurrencyPairService {
     public CurrencyPairResponse deleteCurrencyPair(CurrencyPairDeleteRequest request) {
         CurrencyPair currencyPairToDelete = getCurrencyPair(request.symbol());
         currencyPairRepository.deleteById(currencyPairToDelete.getId());
+        log.info("[{}] : [{}]", DELETED_RESPONSE, request.symbol());
         return new CurrencyPairResponse(DELETED_RESPONSE, mapCurrencyPairToDTO(currencyPairToDelete));
     }
 
@@ -76,8 +78,9 @@ class CurrencyPairService {
      */
     public CurrencyPairResponse changeCurrencyPairData(CurrencyPairUpdateRequest request) {
         CurrencyPair currencyPairToChange = getCurrencyPair(request.symbol());
-        currencyPairToChange.setSymbol(request.symbol());
+        currencyPairToChange.setSymbol(request.currencyPair().symbol());
         CurrencyPair changedCurrencyPair = currencyPairRepository.save(currencyPairToChange);
+        log.info("[{}] -> [{}]  TO: -> [{}] ", EDITED_RESPONSE, request.symbol(), changedCurrencyPair);
         return new CurrencyPairResponse(EDITED_RESPONSE, mapCurrencyPairToDTO(changedCurrencyPair));
     }
 

@@ -32,10 +32,10 @@ class ScrapperService {
     @Value("${binance.apiUrl}")
     private String binanceApiUrl;
 
-    @Value("${scheduler.retryFetchIntervalMilliseconds}")
+    @Value("${scrapper.retryFetchIntervalMilliseconds}")
     private int retryInterval;
 
-    @Value("${scheduler.retryFetchAttempts}")
+    @Value("${scrapper.retryFetchAttempts}")
     private int retryAttempts;
 
     private final RestTemplate restTemplate;

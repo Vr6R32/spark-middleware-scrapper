@@ -128,7 +128,7 @@ class CurrencyPairServiceTest {
     void changeCurrencyPairDataSuccessfullyChangesPairDataHappyPath() {
 
         // Given
-        CurrencyPairUpdateRequest request = new CurrencyPairUpdateRequest(BTCUSDT, new CurrencyPairDTO(1L, BTCUSDT));
+        CurrencyPairUpdateRequest request = new CurrencyPairUpdateRequest(BTCUSDT,new CurrencyPairDTO(1L, BTCUSDT));
 
         CurrencyPair existingPair = new CurrencyPair(1L, BTCUSDT);
         when(currencyPairRepository.findBySymbol(BTCUSDT)).thenReturn(Optional.of(existingPair));
@@ -149,7 +149,7 @@ class CurrencyPairServiceTest {
     void changeCurrencyPairDataFailsThrowsExceptionIfPairNotAvailable() {
 
         // Given
-        CurrencyPairUpdateRequest request = new CurrencyPairUpdateRequest(LTCUSDT, new CurrencyPairDTO(1L, LTCUSDT));
+        CurrencyPairUpdateRequest request = new CurrencyPairUpdateRequest(BTCUSDT,new CurrencyPairDTO(1L, LTCUSDT));
         when(currencyPairRepository.findBySymbol(LTCUSDT)).thenReturn(Optional.empty());
 
         // When / Then
