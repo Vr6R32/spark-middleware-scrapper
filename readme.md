@@ -254,9 +254,26 @@ docker compose up
 
 <h2 align="center">& run all spring services</h2>
 
+<h3 align="center">1.</h3>
+
 <p align="center">
-  <img src="readme/png/local-environment-run.png" style="border-radius: 10px;">
+<img src="readme/png/local-services-instruction-1.png" style="border-radius: 10px;">
 </p>
+
+<h3 align="center">2.</h3>
+
+
+<p align="center">
+<img src="readme/png/local-services-instruction-2.png" style="border-radius: 10px;">
+</p>
+
+<h3 align="center">3.</h3>
+
+<p align="center">
+<img src="readme/png/local-services-instruction-3.png" style="border-radius: 10px;">
+</p>
+
+
 
 <br>
 <br>
