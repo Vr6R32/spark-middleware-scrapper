@@ -21,21 +21,21 @@ public record WsCurrencyPairController(WsCurrencyPairFacade wsCurrencyPairFacade
         wsCurrencyPairFacade.fetchAndSendAvailableCurrenciesToSession(sessionId);
     }
 
-    @MessageMapping("api/v1/last/{symbol}")
+    @MessageMapping("api/v1/currencies/last/{symbol}")
     public void getLatestCurrencyPairRate(@DestinationVariable("symbol") String symbol, StompHeaderAccessor accessor) {
         String sessionId = accessor.getSessionId();
         String userTimeZone = (String) Objects.requireNonNull(accessor.getSessionAttributes()).get(SESSION_TIME_ZONE_ATTRIBUTE);
         wsCurrencyPairFacade.fetchAndSendLatestCurrencyPairRateToSession(symbol,sessionId,userTimeZone);
     }
 
-    @MessageMapping("api/v1/lastDay/{symbol}")
+    @MessageMapping("api/v1/currencies/lastDay/{symbol}")
     public void getCurrencyPairLast24hRateHistory(@DestinationVariable("symbol") String symbol, StompHeaderAccessor accessor) {
         String sessionId = accessor.getSessionId();
         String userTimeZone = (String) Objects.requireNonNull(accessor.getSessionAttributes()).get(SESSION_TIME_ZONE_ATTRIBUTE);
         wsCurrencyPairFacade.fetchAndSendCurrencyPairLast24hRateHistoryToSession(symbol,sessionId,userTimeZone);
     }
 
-    @MessageMapping("api/v1/lastAll")
+    @MessageMapping("api/v1/currencies/lastAll")
     public void getAvailableCurrencyPairsLatestCurrencyRate(StompHeaderAccessor accessor) {
         String sessionId = accessor.getSessionId();
         String userTimeZone = (String) Objects.requireNonNull(accessor.getSessionAttributes()).get(SESSION_TIME_ZONE_ATTRIBUTE);

@@ -1,7 +1,7 @@
 
 function fetchSelectedCoin24hRateHistoryWebSocketEvent(symbol) {
     if (stompClient && stompClient.connected) {
-        stompClient.send('/ws/api/v1/lastDay/' + symbol, {}, null);
+        stompClient.send('/ws/api/v1/currencies/lastDay/' + symbol, {}, null);
     } else {
         setTimeout(() => fetchSelectedCoin24hRateHistoryWebSocketEvent(symbol), 50);
     }
@@ -17,7 +17,7 @@ function fetchAvailableCurrenciesWebSocketEvent() {
 
 function fetchAllAvailableCurrenciesLatestRateWebSocketEvent() {
     if (stompClient && stompClient.connected) {
-        stompClient.send('/ws/api/v1/lastAll', {}, null);
+        stompClient.send('/ws/api/v1/currencies/lastAll', {}, null);
     } else {
         setTimeout(() => fetchAvailableCurrenciesWebSocketEvent(), 50);
     }
@@ -25,7 +25,7 @@ function fetchAllAvailableCurrenciesLatestRateWebSocketEvent() {
 
 function fetchLatestSpecifiedCurrencyRateHistory(symbol) {
     if (stompClient && stompClient.connected) {
-        stompClient.send('/ws/api/v1/last/' + symbol, {}, null);
+        stompClient.send('/ws/api/v1/currencies/last/' + symbol, {}, null);
     } else {
         setTimeout(() => fetchAvailableCurrenciesWebSocketEvent(), 50);
     }
