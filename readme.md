@@ -18,7 +18,7 @@
 <h1 align="left">
 Source:
 </h1>
-Application scrapes market data from Binance, including prices, trading volumes, and other relevant metrics.
+Application scrapes market data from Binance, including prices, in future -> trading volumes, and other relevant metrics.
 
 <h1 align="left">
 Frequency: 
@@ -81,7 +81,6 @@ Application is build as a fully scaled infrastructure with possibility to load u
 Websocket service needs to be upgraded with external DB storage for session data storage.I recommend mongoDB. Then we need message broker for dynamic user connected instanceId recognition.
 </p>
 
-
 <h2 align="left">
 Eureka: 
 </h2>
@@ -93,6 +92,15 @@ Spring Cloud Feign:
 </h2>
 
 Simplifies the development of RESTful clients by providing a higher-level abstraction over HTTP clients. This enables declarative REST calls between microservices.
+
+<h2 align="left">
+API-Gateway:
+</h2>
+
+The API Gateway pattern is used to communicate with the entire infrastructure using a single, stable address.
+It not only enables the implementation of robust security measures across the entire infrastructure but also
+encapsulates and abstracts internal services, providing a streamlined and secure interface for external access.
+
 
 <h2 align="left">
 Prometheus: 
